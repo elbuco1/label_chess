@@ -94,4 +94,4 @@ class FileDownloaderView(View):
         self.rowconfigure(0, minsize=self.minsize, weight=1)
         self.columnconfigure(0, minsize=self.minsize, weight=1)
         self.grid(row=0, column=0, sticky="nsew")
-        self.master.title("File downloader")
+        self.master.title("PGN downloader")
