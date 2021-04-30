@@ -1,0 +1,8 @@
+name: label_chess
+
+channels:
+  - defaults
+
+dependencies:
+  # project utils
+  - python>=3.9,<3.10
