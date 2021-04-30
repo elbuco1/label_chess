@@ -7,10 +7,10 @@ import pathlib
 import json
 import shutil
 
-from app import utils, chess2fen
-import Controller
+from chlabel import utils, chess2fen
+from .base import Controller
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
 
 

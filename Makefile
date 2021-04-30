@@ -7,9 +7,9 @@
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 # BUCKET = [OPTIONAL] your-bucket-for-syncing-data (do not include 's3://')
 # PROFILE = default
-PROJECT_NAME = c2f_explore
+PROJECT_NAME = label_chess
 PYTHON_INTERPRETER = python3
-PACKAGE_NAME =  c2f_explore
+PACKAGE_NAME =  chlabel
 
 ifeq (,$(shell which conda))
 HAS_CONDA=False

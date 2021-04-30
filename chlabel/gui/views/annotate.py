@@ -1,7 +1,11 @@
 import tkinter as tk
+from PIL import Image, ImageTk
+
+from .base import View
+from chlabel import utils, chess2fen
 
 
-class ChessFenAnnotatorView(base.View):
+class ChessFenAnnotatorView(View):
     def __init__(self, master=None, chess_img_height=340):
         super().__init__(master)
         self.master = master
@@ -56,7 +60,7 @@ class PGNFrame(tk.Frame):
         self.labels["fen"] = tk.Label(
             master=self.container)
         self.labels["fen"].grid(row=0, column=0, sticky="nsew")
-        self.set_image(fen2b.create_empty_board())
+        self.set_image(chess2fen.create_empty_board())
 
         # skip fen button
         self.buttons["skip_fen"] = tk.Button(
@@ -155,7 +159,7 @@ class VideoFrame(tk.Frame):
         Args:
             image (PIL.Image)
         """
-        image = resize_image(image, self.chess_img_height)
+        image = utils.resize_image(image, self.chess_img_height)
         image = ImageTk.PhotoImage(image)
         self.labels["frame"].configure(image=image)
         self.labels["frame"].image = image

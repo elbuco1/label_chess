@@ -1,12 +1,8 @@
 import tkinter as tk
-import base
-
-import tkinter as tk
-
-from app.gui.controller import base
+from .base import View
 
 
-class VideoDownloaderView(base.View):
+class VideoDownloaderView(View):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
@@ -66,7 +62,7 @@ class VideoDownloaderView(base.View):
         self.master.title("Youtube video downloader")
 
 
-class FileDownloaderView(base.View):
+class FileDownloaderView(View):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master

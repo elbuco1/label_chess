@@ -5,8 +5,8 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 # Package meta-data.
-NAME = 'app'
-DESCRIPTION = 'App to annotate chess videos'
+NAME = 'chlabel'
+DESCRIPTION = 'Desktop app to annotate chessgames'
 URL = 'https://github.com/elbuco1/label_chess'
 EMAIL = 'lrtboucaud@gmail.com'
 AUTHOR = "Laurent Boucaud"
@@ -19,6 +19,7 @@ def list_reqs(fname='requirements.txt'):
 
 
 INSTALL_REQUIRES = list_reqs(fname='requirements.txt')
+TEST_REQUIRES = list_reqs(fname='requirements-test.txt')
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -52,7 +53,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=('tests',)),
-    package_data={'app': [
+    package_data={'chlabel': [
         'VERSION', 'resources/pieces/*']},
     install_requires=INSTALL_REQUIRES,
     include_package_data=False,

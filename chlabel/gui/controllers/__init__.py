@@ -1,5 +1,5 @@
-from .start_page import StartPageController
+from .start_page import StartPageController, \
+    center_window
 from .download import VideoDownloaderController,\
     FileDownloaderController
-from .base import Controller
 from .annotate import ChessFenAnnotatorController

@@ -1,9 +1,28 @@
 import tkinter as tk
 
-from app.gui import views, controllers
+from .base import Controller
+from chlabel.gui import views, controllers
 
 
-class StartPageController(base.Controller):
+def center_window(win, width, height):
+    """Display a tkinter window at the center
+    of the screen.
+
+    Args:
+        win (tk.Tk): window
+        width (int): window width
+        height ([type]): window height
+    """
+    screen_width = win.winfo_screenwidth()
+    screen_height = win.winfo_screenheight()
+
+    pos_x = int((screen_width-width)/2)
+    pos_y = int((screen_height-height)/2)
+
+    win.geometry(f"{width}x{height}+{pos_x}+{pos_y}")
+
+
+class StartPageController(Controller):
 
     def __init__(self):
         self.video_height = 115

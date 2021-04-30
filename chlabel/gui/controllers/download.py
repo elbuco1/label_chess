@@ -3,8 +3,8 @@ from tkinter import filedialog
 from tkinter import messagebox
 import os
 
-from app import utils
-import Controller
+from chlabel import utils
+from .base import Controller
 
 
 class VideoDownloaderController(Controller):
@@ -81,7 +81,7 @@ class VideoDownloaderController(Controller):
         return file_path.name
 
 
-class FileDownloaderController(base.Controller):
+class FileDownloaderController(Controller):
     def __init__(self):
         self.view = None
 

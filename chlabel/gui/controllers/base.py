@@ -1,7 +1,8 @@
 import tkinter as tk
+import abc
 
 
-class View(tk.Frame):
+class Controller(abc.ABC):
     @abc.abstractmethod
-    def create_view(self):
+    def bind_view(self, view):
         raise NotImplementedError

@@ -1,6 +1,9 @@
+import tkinter as tk
+
+from .base import View
 
 
-class StartPageView(base.View):
+class StartPageView(View):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
