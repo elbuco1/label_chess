@@ -4,7 +4,7 @@
 #     next_frame = Image.fromarray(next(self.frame_generator))
 # StopIteration
 # TODO overlay box above buttons to explain
-# TODO revert last save
+# TODO invert positions of image and pgn (hand/eye coordination)
 # TODO popup when saved
 # TODO flash buttons when using keyboard bind
 # TODO save in csv (use Model from MVC pattern)

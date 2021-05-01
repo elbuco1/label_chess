@@ -19,15 +19,15 @@ class ChessFenAnnotatorView(View):
         self.frames["side_menu"].create_view()
         self.frames["side_menu"].grid(row=0, column=0, sticky="nsew")
 
-        self.frames["video"] = VideoFrame(self,
-                                          chess_img_height=self.chess_img_height)
-        self.frames["video"].create_view()
-        self.frames["video"].grid(row=0, column=1, sticky="nsew")
-
         self.frames["pgn"] = PGNFrame(self,
                                       img_height=self.chess_img_height)
         self.frames["pgn"].create_view()
-        self.frames["pgn"].grid(row=0, column=2, sticky="nsew")
+        self.frames["pgn"].grid(row=0, column=1, sticky="nsew")
+
+        self.frames["video"] = VideoFrame(self,
+                                          chess_img_height=self.chess_img_height)
+        self.frames["video"].create_view()
+        self.frames["video"].grid(row=0, column=2, sticky="nsew")
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self

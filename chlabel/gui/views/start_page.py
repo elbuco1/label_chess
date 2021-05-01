@@ -46,4 +46,4 @@ class StartPageView(View):
         self.rowconfigure(0, minsize=self.minsize, weight=1)
         self.columnconfigure(0, minsize=self.minsize, weight=1)
         self.grid(row=0, column=0, sticky="nsew")
-        self.master.title("Chess annotator")
+        self.master.title("Label Chess")
