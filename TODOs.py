@@ -1,7 +1,3 @@
-# TODO create a function update buttons that changes the state of every buttons
-# depending on the self.args -> this way the logic isn't scattered everywhere
-# do it for every controller
-# use state variable to know which function called the button state updater
 # TODO resize
 # TODO overlay box above buttons to explain
 # TODO popup when saved
