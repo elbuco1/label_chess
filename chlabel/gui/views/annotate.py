@@ -128,7 +128,7 @@ class VideoFrame(tk.Frame):
             master=self.frm_images_buttons,
             text="Next(\N{RIGHTWARDS BLACK ARROW})",
             state="disabled")
-        self.buttons["next_frame"].grid(row=1, column=2, sticky="e")
+        self.buttons["next_frame"].grid(row=1, column=3, sticky="e")
 
         # previous frame button
         self.buttons["previous_frame"] = tk.Button(
@@ -143,6 +143,13 @@ class VideoFrame(tk.Frame):
             text="Save(\N{UPWARDS BLACK ARROW})",
             state="disabled")
         self.buttons["save_frame"].grid(row=1, column=1)
+
+        # unsave frame button
+        self.buttons["unsave_frame"] = tk.Button(
+            master=self.frm_images_buttons,
+            text="Unsave(\N{DOWNWARDS BLACK ARROW})",
+            state="disabled")
+        self.buttons["unsave_frame"].grid(row=1, column=2)
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self

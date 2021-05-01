@@ -41,6 +41,8 @@ class ChessFenAnnotatorController(Controller):
             command=self.get_previous_frame)
         video_frame.buttons["save_frame"].configure(
             command=self.save_frame)
+        video_frame.buttons["unsave_frame"].configure(
+            command=self.unsave_frame)
 
         # pgn frame commands
         pgn_frame = self.view.frames["pgn"]
@@ -52,7 +54,8 @@ class ChessFenAnnotatorController(Controller):
     def setup_variables(self):
         self.frames = []
         self.current_frame = -1
-        self.last_saved_frame = -1
+        self.last_saved_frame = [-1]
+        self.last_saved_fen = [-1]
         self.video_loaded = False
         self.current_fen = -1
         self.fen_images, self.fens = None, None
@@ -69,6 +72,8 @@ class ChessFenAnnotatorController(Controller):
                               lambda event: video_btns["next_frame"].invoke())
         self.view.master.bind('<Up>',
                               lambda event: video_btns["save_frame"].invoke())
+        self.view.master.bind('<Down>',
+                              lambda event: video_btns["unsave_frame"].invoke())
         self.view.master.bind('<space>',
                               lambda event: pgn_btns["skip_fen"].invoke())
 
@@ -185,15 +190,14 @@ class ChessFenAnnotatorController(Controller):
         """Go back to positions in self.frames
         and display next frame.
         """
-        if self.current_frame > self.last_saved_frame + 1:
+        if self.current_frame > self.last_saved_frame[-1] + 1:
             self.current_frame -= 2
             self.get_next_frame()
             self.view.frames["video"].activate_button("next_frame")
 
         # disable previous frame button
         previous_frm_btn = self.view.frames["video"].buttons["previous_frame"]
-        if previous_frm_btn["state"] == "normal" and \
-                self.current_frame == self.last_saved_frame + 1:
+        if self.current_frame == self.last_saved_frame[-1] + 1:
             self.view.frames["video"].disable_button("previous_frame")
 
     def save_frame(self, event=None):
@@ -207,26 +211,76 @@ class ChessFenAnnotatorController(Controller):
         frame = self.frames[self.current_frame]
         fen = self.fens[self.current_fen]
 
-        frame_path = os.path.join(
-            self.save_dir,
-            f"frame{self.current_frame}.jpeg"
+        frame_path, fen_path = self.get_save_paths(
+            self.current_frame
         )
 
-        fen_path = os.path.join(
-            self.save_dir,
-            f"frame{self.current_frame}.json"
-        )
         fen = {"fen": fen}
         json.dump(fen, open(fen_path, "w"))
 
         frame.save(frame_path)
-        self.last_saved_frame = self.current_frame
+        self.last_saved_frame.append(self.current_frame)
+        self.last_saved_fen.append(self.current_fen)
+
         self.get_next_frame()
         self.get_next_fen()
 
         self.view.frames["video"].disable_button("previous_frame")
+        self.view.frames["video"].activate_button("unsave_frame")
         self.view.frames["side_menu"].disable_button("save_dir")
         self.view.frames["side_menu"].disable_button("pgn")
+
+    def get_save_paths(self, frame):
+        """Get the paths to save frame to jpeg
+        and fen to json. Files are named after
+        a frame id
+
+        Args:
+            frame (int): frame id
+
+        Returns:
+            str: jpeg fiel path
+            str: json fiel path
+        """
+        frame_path = os.path.join(
+            self.save_dir,
+            f"frame{frame}.jpeg"
+        )
+
+        fen_path = os.path.join(
+            self.save_dir,
+            f"frame{frame}.json"
+        )
+        return frame_path, fen_path
+
+    def unsave_frame(self):
+        """Revert the last saved frame
+        """
+        # if at least one frame has been saved
+        if len(self.last_saved_frame) > 1:
+            # get last saved frame and fen ids
+            # and remove them from the save history
+            last_save_frame = self.last_saved_frame.pop()
+            last_save_fen = self.last_saved_fen.pop()
+            # get paths of last saved frame and fen
+            # then delete them
+            frame_path, fen_path = self.get_save_paths(
+                last_save_frame
+            )
+            os.remove(frame_path)
+            os.remove(fen_path)
+            # plot the last save fen
+            self.current_fen = last_save_fen - 1
+            self.get_next_fen()
+
+        # reenable previous frame button
+        self.view.frames["video"].activate_button(
+            "previous_frame")
+        # if no more saved frame in history, disable
+        # unsave button
+        if len(self.last_saved_frame) < 2:
+            self.view.frames["video"].disable_button(
+                "unsave_frame")
 
     def reset_app(self, event=None):
         """Reset video and pgn.
