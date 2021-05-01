@@ -160,17 +160,20 @@ class ChessFenAnnotatorController(Controller):
         If self.current_frame is in (-1; len(self.frames)-1) then
         take the frame from the list of already generated frames.
         """
-        self.current_frame += 1
+        try:
+            self.current_frame += 1
 
-        if self.current_frame > -1 and \
-                self.current_frame < len(self.frames)-1:
-            next_frame = self.frames[self.current_frame]
-        else:
-            next_img = next(self.frame_generator)
-            next_frame = Image.fromarray(next_img)
-            self.frames.append(next_frame)
-
-        self.view.frames["video"].set_image(next_frame)
+            if self.current_frame > -1 and \
+                    self.current_frame < len(self.frames)-1:
+                next_frame = self.frames[self.current_frame]
+            else:
+                next_img = next(self.frame_generator)
+                next_frame = Image.fromarray(next_img)
+                self.frames.append(next_frame)
+            self.view.frames["video"].set_image(next_frame)
+        except StopIteration:
+            self.current_frame -= 1
+            self.view.frames["video"].disable_button("next_frame")
 
         # enable previous frame button
         previous_frm_btn = self.view.frames["video"].buttons["previous_frame"]
@@ -185,6 +188,7 @@ class ChessFenAnnotatorController(Controller):
         if self.current_frame > self.last_saved_frame + 1:
             self.current_frame -= 2
             self.get_next_frame()
+            self.view.frames["video"].activate_button("next_frame")
 
         # disable previous frame button
         previous_frm_btn = self.view.frames["video"].buttons["previous_frame"]
