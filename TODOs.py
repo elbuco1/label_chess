@@ -1,5 +1,4 @@
 # TODO resize
-# TODO flash buttons when using keyboard bind <- not doable macos
 # TODO save in csv (use Model from MVC pattern)
 # TODO pip package pgn to pngs
 # TODO new repo

@@ -19,6 +19,10 @@ class ChessFenAnnotatorController(Controller):
         self.view = None
         self.pieces_path = PIECES_PATH
         self.setup_variables()
+        self.save_color = "#2CE26E"
+        self.unsave_color = "#F4241E"
+        self.popup_dur = 1000
+        self.flash_dur = 100
 
     def bind_view(self, view):
         self.view = view
@@ -64,6 +68,7 @@ class ChessFenAnnotatorController(Controller):
         """
         video_btns = self.view.frames["video"].buttons
         pgn_btns = self.view.frames["pgn"].buttons
+        # bind commands to buttons
         self.view.master.bind('<Left>',
                               lambda event: video_btns["previous_frame"].invoke())  # .flash
         self.view.master.bind('<Right>',
@@ -74,6 +79,18 @@ class ChessFenAnnotatorController(Controller):
                               lambda event: video_btns["unsave_frame"].invoke())
         self.view.master.bind('<space>',
                               lambda event: pgn_btns["skip_fen"].invoke())
+
+        # flash buttons
+        self.view.master.bind('<Left>', lambda event: self.flash(
+            video_btns["previous_frame"], self.flash_dur), add="+")
+        self.view.master.bind('<Right>', lambda event: self.flash(
+            video_btns["next_frame"], self.flash_dur), add="+")
+        self.view.master.bind('<Up>', lambda event: self.flash(
+            video_btns["save_frame"], self.flash_dur), add="+")
+        self.view.master.bind('<Down>', lambda event: self.flash(
+            video_btns["unsave_frame"], self.flash_dur), add="+")
+        self.view.master.bind('<space>', lambda event: self.flash(
+            pgn_btns["skip_fen"], self.flash_dur), add="+")
 
     def update_states(self, caller):
         """Activation/Deactivation of components. To change state
@@ -105,8 +122,8 @@ class ChessFenAnnotatorController(Controller):
 
             label = self.view.frames["video"].labels["saved"]
             self.label_popup(
-                label=label, color="#2CE26E", text="frame saved",
-                time=300)
+                label=label, color=self.save_color, text="frame saved",
+                time=self.popup_dur)
 
         elif caller == "next_frame_empty":
             self.view.frames["video"].disable_button("next_frame")
@@ -129,8 +146,8 @@ class ChessFenAnnotatorController(Controller):
 
             label = self.view.frames["video"].labels["saved"]
             self.label_popup(
-                label=label, color="#F4241E", text="frame unsaved",
-                time=300)
+                label=label, color=self.unsave_color, text="frame unsaved",
+                time=self.popup_dur)
 
     def select_fps(self, *args):
         """Select the subsampling rate for the video
@@ -324,6 +341,11 @@ class ChessFenAnnotatorController(Controller):
             bg=color, text=text)
 
         label.after(time, lambda: label.config(bg=orig_color, text=""))
+
+    def flash(self, button, time):
+        orig_state = button["state"]
+        button.config(state="active")
+        button.after(time, lambda: button.config(state=orig_state))
 
     def reset_app(self, event=None):
         """Reset video and pgn.
