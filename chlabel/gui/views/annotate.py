@@ -151,6 +151,11 @@ class VideoFrame(tk.Frame):
             state="disabled")
         self.buttons["unsave_frame"].grid(row=1, column=2)
 
+        # label to display popup when frame is saves
+        self.labels["saved"] = tk.Label(
+            master=self.frm_images_buttons)
+        self.labels["saved"].grid(row=1, column=4, sticky="nsew")
+
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self
         """

@@ -103,6 +103,11 @@ class ChessFenAnnotatorController(Controller):
             self.view.frames["side_menu"].disable_button("save_dir")
             self.view.frames["side_menu"].disable_button("pgn")
 
+            label = self.view.frames["video"].labels["saved"]
+            self.label_popup(
+                label=label, color="#2CE26E", text="frame saved",
+                time=300)
+
         elif caller == "next_frame_empty":
             self.view.frames["video"].disable_button("next_frame")
         elif caller == "next_frame":
@@ -121,6 +126,11 @@ class ChessFenAnnotatorController(Controller):
             if len(self.last_saved_frame) < 2:
                 self.view.frames["video"].disable_button(
                     "unsave_frame")
+
+            label = self.view.frames["video"].labels["saved"]
+            self.label_popup(
+                label=label, color="#F4241E", text="frame unsaved",
+                time=300)
 
     def select_fps(self, *args):
         """Select the subsampling rate for the video
@@ -297,6 +307,23 @@ class ChessFenAnnotatorController(Controller):
             self.get_next_fen()
 
         self.update_states(caller="unsave_frame")
+
+    def label_popup(self, label, color, text, time):
+        """Change color and text of a label, then after
+        a while, empty text and reset color to original
+        color.
+
+        Args:
+            label (tk.Label)
+            color (str): color to display in label
+            text (str): text to display in label
+            time (int): waiting time before reset in ms
+        """
+        orig_color = label.cget("background")
+        label.config(
+            bg=color, text=text)
+
+        label.after(time, lambda: label.config(bg=orig_color, text=""))
 
     def reset_app(self, event=None):
         """Reset video and pgn.
