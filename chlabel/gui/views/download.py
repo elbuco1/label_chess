@@ -6,7 +6,6 @@ class VideoDownloaderView(View):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.minsize = 25
 
         self.resolutions = ["1080p",
                             "720p",
@@ -49,24 +48,27 @@ class VideoDownloaderView(View):
 
     def create_label_frame(self, text):
         frm = tk.LabelFrame(self, text=text)
-        frm.rowconfigure(0, weight=1)
         frm.columnconfigure(0, weight=1)
         return frm
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self
         """
-        self.rowconfigure(0, minsize=self.minsize, weight=1)
-        self.columnconfigure(0, minsize=self.minsize, weight=1)
-        self.grid(row=0, column=0, sticky="nsew")
+        # resizable window
+        self.master.resizable(width=True, height=False)
+        self.master.rowconfigure(0,  weight=1)
+        self.master.columnconfigure(0, weight=1)
         self.master.title("Youtube video downloader")
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure([0, 1, 2], weight=1)
+        self.grid(row=0, column=0, sticky="nsew")
 
 
 class FileDownloaderView(View):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.minsize = 25
 
         self.entries = {}
         self.buttons = {}
@@ -79,6 +81,7 @@ class FileDownloaderView(View):
         # URL entry
         frm_label = "URL"
         self.frm_url = tk.LabelFrame(self, text=frm_label)
+        self.frm_url.columnconfigure(0, weight=1)
         self.entries[frm_label] = tk.Entry(self.frm_url)
         self.entries[frm_label].grid(row=0, column=0, sticky="nsew")
         self.frm_url.grid(row=0, column=0, sticky="nsew")
@@ -91,7 +94,12 @@ class FileDownloaderView(View):
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e., self
         """
-        self.rowconfigure(0, minsize=self.minsize, weight=1)
-        self.columnconfigure(0, minsize=self.minsize, weight=1)
-        self.grid(row=0, column=0, sticky="nsew")
+        # resizable window
+        self.master.resizable(width=True, height=False)
+        self.master.rowconfigure(0, weight=1)
+        self.master.columnconfigure(0, weight=1)
         self.master.title("PGN downloader")
+        # resizable view
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure([0, 1], weight=1)
+        self.grid(row=0, column=0, sticky="nsew")

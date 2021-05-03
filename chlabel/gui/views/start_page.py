@@ -8,7 +8,6 @@ class StartPageView(View):
         super().__init__(master)
         self.master = master
 
-        self.minsize = 25
         self.buttons = {}
 
         self.config_window()
@@ -17,7 +16,7 @@ class StartPageView(View):
         """Create all app's widgets
         """
         self.container = tk.LabelFrame(self, text="Menu")
-        self.container.rowconfigure(0, weight=1)
+        self.container.rowconfigure([0, 1, 2], weight=1)
         self.container.columnconfigure(0, weight=1)
         self.container.grid(row=0, column=0,
                             sticky="nsew")
@@ -43,7 +42,12 @@ class StartPageView(View):
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e., self
         """
-        self.rowconfigure(0, minsize=self.minsize, weight=1)
-        self.columnconfigure(0, minsize=self.minsize, weight=1)
-        self.grid(row=0, column=0, sticky="nsew")
+        # resizable window
+        self.master.rowconfigure(0, weight=1)
+        self.master.columnconfigure(0, weight=1)
         self.master.title("Label Chess")
+
+        # resizable view
+        self.rowconfigure(0,  weight=1)
+        self.columnconfigure(0, weight=1)
+        self.grid(row=0, column=0, sticky="nsew")

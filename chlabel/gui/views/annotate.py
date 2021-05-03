@@ -32,11 +32,14 @@ class ChessFenAnnotatorView(View):
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self
         """
-        self.master.resizable(False, False)
-        # self.rowconfigure(0,  weight=1)
-        # self.columnconfigure(0, weight=1)
-        self.grid(row=0, column=0, sticky="nsew")
+        self.master.resizable(True, True)
+        self.master.rowconfigure(0,  weight=1)
+        self.master.columnconfigure(0, weight=1)
         self.master.title("Chess video FEN annotator")
+
+        self.columnconfigure([0, 1, 2], weight=1)
+        self.rowconfigure(0, weight=1)
+        self.grid(row=0, column=0, sticky="nsew")
 
 
 class PGNFrame(tk.Frame):
@@ -52,7 +55,7 @@ class PGNFrame(tk.Frame):
     def create_view(self):
         # Label frame container
         self.container = tk.LabelFrame(master=self, text="Positions")
-        self.container.rowconfigure(0,  weight=1)
+        self.container.rowconfigure([0, 1],  weight=1)
         self.container.columnconfigure(0, weight=1)
         self.container.grid(row=0, column=0, sticky="nsew")
 
@@ -67,7 +70,7 @@ class PGNFrame(tk.Frame):
             master=self.container,
             text="Skip(Space)",
             state="disabled")
-        self.buttons["skip_fen"].grid(row=2, column=0, sticky="ew")
+        self.buttons["skip_fen"].grid(row=1, column=0, sticky="nsew")
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self
@@ -109,7 +112,7 @@ class VideoFrame(tk.Frame):
     def create_view(self):
         # Label frame container
         self.container = tk.LabelFrame(master=self, text="Video")
-        self.container.rowconfigure(0,  weight=1)
+        self.container.rowconfigure([0, 1],  weight=1)
         self.container.columnconfigure(0, weight=1)
         self.container.grid(row=0, column=0, sticky="nsew")
 
@@ -121,40 +124,42 @@ class VideoFrame(tk.Frame):
 
         # frames navigation buttons
         self.frm_images_buttons = tk.Frame(master=self.container)
-        self.frm_images_buttons.grid(row=1, column=0, sticky="ns")
-
-        # next button
-        self.buttons["next_frame"] = tk.Button(
-            master=self.frm_images_buttons,
-            text="Next(\N{RIGHTWARDS BLACK ARROW})",
-            state="disabled")
-        self.buttons["next_frame"].grid(row=1, column=3, sticky="e")
+        self.frm_images_buttons.grid(row=1, column=0, sticky="nsew")
+        self.frm_images_buttons.rowconfigure(0,  weight=1)
+        self.frm_images_buttons.columnconfigure([0, 1, 2, 3, 4], weight=1)
 
         # previous frame button
         self.buttons["previous_frame"] = tk.Button(
             master=self.frm_images_buttons,
             text="Previous(\N{LEFTWARDS BLACK ARROW})",
             state="disabled")
-        self.buttons["previous_frame"].grid(row=1, column=0, sticky="w")
+        self.buttons["previous_frame"].grid(row=0, column=0, sticky="nsew")
 
         # save frame button
         self.buttons["save_frame"] = tk.Button(
             master=self.frm_images_buttons,
             text="Save(\N{UPWARDS BLACK ARROW})",
             state="disabled")
-        self.buttons["save_frame"].grid(row=1, column=1)
+        self.buttons["save_frame"].grid(row=0, column=1, sticky="nsew")
 
         # unsave frame button
         self.buttons["unsave_frame"] = tk.Button(
             master=self.frm_images_buttons,
             text="Unsave(\N{DOWNWARDS BLACK ARROW})",
             state="disabled")
-        self.buttons["unsave_frame"].grid(row=1, column=2)
+        self.buttons["unsave_frame"].grid(row=0, column=3, sticky="nsew")
+
+        # next button
+        self.buttons["next_frame"] = tk.Button(
+            master=self.frm_images_buttons,
+            text="Next(\N{RIGHTWARDS BLACK ARROW})",
+            state="disabled")
+        self.buttons["next_frame"].grid(row=0, column=4, sticky="nsew")
 
         # label to display popup when frame is saves
         self.labels["saved"] = tk.Label(
             master=self.frm_images_buttons)
-        self.labels["saved"].grid(row=1, column=4, sticky="nsew")
+        self.labels["saved"].grid(row=0, column=2, sticky="nsew")
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self
@@ -198,9 +203,8 @@ class SideMenuFrame(tk.Frame):
     def create_view(self):
         # Label frame container
         self.container = tk.LabelFrame(master=self, text="Menu")
-        self.container.rowconfigure(0,  weight=1)
         self.container.columnconfigure(0, weight=1)
-        self.container.grid(row=0, column=0, sticky="new")
+        self.container.grid(row=0, column=0, sticky="nsew")
 
         # save directory button
         self.buttons["save_dir"] = tk.Button(

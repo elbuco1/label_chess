@@ -25,47 +25,59 @@ def center_window(win, width, height):
 class StartPageController(Controller):
 
     def __init__(self):
-        self.video_height = 115
-        self.video_width = 195
+        self.video_height = 1/8
+        self.video_width = 2.2
 
-        self.pgn_height = 75
-        self.pgn_width = 195
+        self.pgn_height = 1/12
+        self.pgn_width = 3
 
-        self.annotation_height = 390
-        self.annotation_width = 1075
+        self.annotation_height = 3/7
+        self.annotation_width = 3
 
     def bind_view(self, view):
+        """Bind buttons to open new windows
+        """
         self.view = view
         self.view.create_view()
 
         self.view.buttons["video"].configure(
             command=lambda: self.open_window(
-                frame=views.VideoDownloaderView,
+                view=views.VideoDownloaderView,
                 controller=controllers.VideoDownloaderController,
-                width=self.video_width,
-                height=self.video_height
+                width_factor=self.video_width,
+                height_ratio=self.video_height
             ))
 
         self.view.buttons["pgn"].configure(
             command=lambda: self.open_window(
-                frame=views.FileDownloaderView,
+                view=views.FileDownloaderView,
                 controller=controllers.FileDownloaderController,
-                width=self.pgn_width,
-                height=self.pgn_height
+                width_factor=self.pgn_width,
+                height_ratio=self.pgn_height
             ))
 
         self.view.buttons["annotation"].configure(
             command=lambda: self.open_window(
-                frame=views.ChessFenAnnotatorView,
+                view=views.ChessFenAnnotatorView,
                 controller=controllers.ChessFenAnnotatorController,
-                width=self.annotation_width,
-                height=self.annotation_height
+                width_factor=self.annotation_width,
+                height_ratio=self.annotation_height
             ))
 
-    def open_window(self, frame, controller, width, height):
+    def open_window(self, view, controller, height_ratio, width_factor):
+        """ Open a window from top window
+        """
+        # create new window from root Tk object
         window = tk.Toplevel(self.view.master)
+        # height is a proportion of the screen
+        height = int(window.winfo_screenheight() * height_ratio)
+        # width is height multiplied by a factor
+        width = int(height * width_factor)
+        # center new window on screen
         center_window(window, width, height)
+        # redirect keyboard to new window
         window.grab_set()
-        frame = frame(master=window)
+        # create and bind view and controller
+        view = view(master=window)
         controller = controller()
-        controller.bind_view(view=frame)
+        controller.bind_view(view=view)
