@@ -6,13 +6,15 @@ class ChessAnnotatorApp(tk.Tk):
     """App's entrypoint
     """
 
-    def __init__(self, width=178, height=103):
+    def __init__(self, width=2.3, height=4/7):
         super().__init__()
-        frame = views.StartPageView(master=self)
-        controller = controllers.StartPageController()
-        controller.bind_view(frame)
-
-        controllers.center_window(self, width, height)
+        controllers.open_window(
+            root=self,
+            new_view=views.ChessFenAnnotatorView,
+            new_controller=controllers.ChessFenAnnotatorController,
+            height_ratio=height,
+            width_factor=width
+        )
 
 
 if __name__ == "__main__":

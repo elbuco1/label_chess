@@ -14,6 +14,45 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
 
 
+def center_window(win, width, height):
+    """Display a tkinter window at the center
+    of the screen.
+
+    Args:
+        win (tk.Tk): window
+        width (int): window width
+        height ([type]): window height
+    """
+    screen_width = win.winfo_screenwidth()
+    screen_height = win.winfo_screenheight()
+
+    pos_x = int((screen_width-width)/2)
+    pos_y = int((screen_height-height)/2)
+
+    win.geometry(f"{width}x{height}+{pos_x}+{pos_y}")
+
+
+def open_window(root, new_view, new_controller,
+                height_ratio, width_factor, top_level=False):
+    """ Open a window from top window
+    """
+    # create new window from root Tk object
+    if top_level:
+        root = tk.Toplevel(root)
+    # height is a proportion of the screen
+    height = int(root.winfo_screenheight() * height_ratio)
+    # width is height multiplied by a factor
+    width = int(height * width_factor)
+    # center new window on screen
+    center_window(root, width, height)
+    # redirect keyboard to new window
+    root.grab_set()
+    # create and bind view and controller
+    new_view = new_view(master=root)
+    new_controller = new_controller()
+    new_controller.bind_view(view=new_view)
+
+
 class ChessFenAnnotatorController(Controller):
     def __init__(self):
         self.view = None
@@ -28,14 +67,14 @@ class ChessFenAnnotatorController(Controller):
         self.view = view
         self.view.create_view()
 
-        # side menu commands
-        side_menu = self.view.frames["side_menu"]
-        side_menu.string_vars["fps"].trace(
-            "w", self.select_fps)
-        side_menu.buttons["save_dir"].configure(command=self.select_save_dir)
-        side_menu.buttons["video"].configure(command=self.load_video)
-        side_menu.buttons["pgn"].configure(command=self.load_pgn)
-        side_menu.buttons["reset"].configure(command=self.reset_app)
+        # # side menu commands
+        # side_menu = self.view.frames["side_menu"]
+        # side_menu.string_vars["fps"].trace(
+        #     "w", self.select_fps)
+        # side_menu.buttons["save_dir"].configure(command=self.select_save_dir)
+        # side_menu.buttons["video"].configure(command=self.load_video)
+        # side_menu.buttons["pgn"].configure(command=self.load_pgn)
+        # side_menu.buttons["reset"].configure(command=self.reset_app)
 
         # video frame commands
         video_frame = self.view.frames["video"]
@@ -80,6 +119,16 @@ class ChessFenAnnotatorController(Controller):
         self.view.master.bind('<space>',
                               lambda event: pgn_btns["skip_fen"].invoke())
 
+        # resize video image automatically when window is resized
+        video_frame = self.view.frames["video"]
+        video_frame.bind('<Configure>',
+                         lambda event: self.resize_image(video_frame, event))
+
+        # resize pgn image automatically when window is resized
+        pgn_frame = self.view.frames["pgn"]
+        pgn_frame.bind('<Configure>',
+                       lambda event: self.resize_image(pgn_frame, event))
+
         # flash buttons
         self.view.master.bind('<Left>', lambda event: self.flash(
             video_btns["previous_frame"], self.flash_dur), add="+")
@@ -92,6 +141,18 @@ class ChessFenAnnotatorController(Controller):
         self.view.master.bind('<space>', lambda event: self.flash(
             pgn_btns["skip_fen"], self.flash_dur), add="+")
 
+    def resize_image(self, frame, event):
+        """Assuming a view that posess a method
+        resize_image that resizes its images based
+        on height.
+
+        Args:
+            frame (base.View): View with method
+                resize_image
+        """
+        new_height = event.height
+        frame.resize_image(new_height)
+
     def update_states(self, caller):
         """Activation/Deactivation of components. To change state
         of components, methods should call this method. This allows
@@ -102,23 +163,25 @@ class ChessFenAnnotatorController(Controller):
                 update_states
         """
         if caller == "select_fps":
-            self.view.frames["side_menu"].activate_button("video")
+            # self.view.frames["side_menu"].activate_button("video")
+            pass
         elif caller == "select_save_dir":
-            self.view.frames["side_menu"].activate_button("fps")
+            # self.view.frames["side_menu"].activate_button("fps")
+            pass
         elif caller == "load_video":
             self.view.frames["video"].activate_button("next_frame")
-            self.view.frames["side_menu"].activate_button("pgn")
-            self.view.frames["side_menu"].disable_button("fps")
+            # self.view.frames["side_menu"].activate_button("pgn")
+            # self.view.frames["side_menu"].disable_button("fps")
 
         elif caller == "load_pgn":
             self.view.frames["pgn"].activate_button("skip_fen")
             self.view.frames["video"].activate_button("save_frame")
-            self.view.frames["side_menu"].disable_button("video")
+            # self.view.frames["side_menu"].disable_button("video")
         elif caller == "save_frame":
             self.view.frames["video"].disable_button("previous_frame")
             self.view.frames["video"].activate_button("unsave_frame")
-            self.view.frames["side_menu"].disable_button("save_dir")
-            self.view.frames["side_menu"].disable_button("pgn")
+            # self.view.frames["side_menu"].disable_button("save_dir")
+            # self.view.frames["side_menu"].disable_button("pgn")
 
             label = self.view.frames["video"].labels["saved"]
             self.label_popup(
@@ -149,16 +212,16 @@ class ChessFenAnnotatorController(Controller):
                 label=label, color=self.unsave_color, text="frame unsaved",
                 time=self.popup_dur)
 
-    def select_fps(self, *args):
-        """Select the subsampling rate for the video
-        before loading the video.
-        Only once this has been selected can the video
-        be loaded.
-        """
-        side_menu = self.view.frames["side_menu"]
-        fps_variable = side_menu.string_vars["fps"]
-        self.fps_ratio = int(fps_variable.get())
-        self.update_states(caller="select_fps")
+    # def select_fps(self, *args):
+    #     """Select the subsampling rate for the video
+    #     before loading the video.
+    #     Only once this has been selected can the video
+    #     be loaded.
+    #     """
+    #     side_menu = self.view.frames["side_menu"]
+    #     fps_variable = side_menu.string_vars["fps"]
+    #     self.fps_ratio = int(fps_variable.get())
+    #     self.update_states(caller="select_fps")
 
     def select_save_dir(self):
         """Open a dialog to select a directory

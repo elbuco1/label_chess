@@ -1,3 +1,4 @@
+# TODO force aspect ratio when resizing window
 # TODO save in csv (use Model from MVC pattern)
 # TODO inner database
 # TODO docstrings
