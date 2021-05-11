@@ -14,6 +14,7 @@ class ChessFenAnnotatorView(View):
 
         self.frames = {}
         self.buttons = {}
+        self.menus = {}
 
     def create_view(self):
         self.container = tk.Frame(master=self)
@@ -34,6 +35,39 @@ class ChessFenAnnotatorView(View):
 
         self.buttons["start_button"] = tk.Button(self, text="START")
         self.buttons["start_button"].grid(row=1, column=0, sticky="nsew")
+
+        self.add_menu()
+        # self.disable_menu()
+
+    def add_menu(self):
+        self.menus["main"] = tk.Menu(self.master)
+        self.menus["annotations"] = tk.Menu(self.menus["main"])
+        self.menus["main"].add_cascade(label="Annotations",
+                                       menu=self.menus["annotations"])
+        self.menus["annotations"].add_command(
+            label="New", command=lambda: None)
+        self.menus["annotations"].add_command(
+            label="Save", command=lambda: None)
+        self.menus["annotations"].add_command(
+            label="Load", command=lambda: None)
+        self.menus["annotations"].add_command(
+            label="Export", command=lambda: None)
+
+        self.menus["download"] = tk.Menu(self.menus["main"])
+        self.menus["main"].add_cascade(
+            label="Download", menu=self.menus["download"])
+        self.menus["download"].add_command(label="Video", command=lambda: None)
+        self.menus["download"].add_command(label="PGN", command=lambda: None)
+        self.master.config(menu=self.menus["main"])
+
+    # TODO disable menu
+    def disable_menu(self):
+        self.menus["main"].entryconfig("Annotations", state="disabled")
+        self.menus["main"].entryconfig("Download", state="disabled")
+
+    def enable_menu(self):
+        self.menus["main"].entryconfig("Annotations", state="normal")
+        self.menus["main"].entryconfig("Download", state="normal")
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self

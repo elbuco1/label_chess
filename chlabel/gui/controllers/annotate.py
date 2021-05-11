@@ -9,6 +9,7 @@ import shutil
 
 from chlabel import utils, chess2fen
 from .base import Controller
+from chlabel.gui import views, controllers
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
@@ -37,18 +38,21 @@ def open_window(root, new_view, new_controller,
     """ Open a window from top window
     """
     # create new window from root Tk object
+    window = root
     if top_level:
-        root = tk.Toplevel(root)
+        window = tk.Toplevel(root)
+        window.attributes('-topmost', True)
+
     # height is a proportion of the screen
-    height = int(root.winfo_screenheight() * height_ratio)
+    height = int(window.winfo_screenheight() * height_ratio)
     # width is height multiplied by a factor
     width = int(height * width_factor)
     # center new window on screen
-    center_window(root, width, height)
+    center_window(window, width, height)
     # redirect keyboard to new window
-    root.grab_set()
+    window.grab_set()
     # create and bind view and controller
-    new_view = new_view(master=root)
+    new_view = new_view(master=window)
     new_controller = new_controller()
     new_controller.bind_view(view=new_view)
 
@@ -63,6 +67,12 @@ class ChessFenAnnotatorController(Controller):
         self.popup_dur = 1000
         self.flash_dur = 100
 
+        self.video_height = 1/8
+        self.video_width = 2.2
+
+        self.pgn_height = 1/12
+        self.pgn_width = 3
+
     def bind_view(self, view):
         self.view = view
         self.view.create_view()
@@ -75,6 +85,31 @@ class ChessFenAnnotatorController(Controller):
         # side_menu.buttons["video"].configure(command=self.load_video)
         # side_menu.buttons["pgn"].configure(command=self.load_pgn)
         # side_menu.buttons["reset"].configure(command=self.reset_app)
+
+        # menu commands
+        self.view.menus[
+            "download"].entryconfigure(
+                "Video", command=lambda: controllers.open_window(
+                    root=self.view.master,
+                    new_view=views.VideoDownloaderView,
+                    new_controller=controllers.VideoDownloaderController,
+                    height_ratio=self.video_height,
+                    width_factor=self.video_width,
+                    top_level=True
+                )
+        )
+
+        self.view.menus[
+            "download"].entryconfigure(
+                "PGN", command=lambda: controllers.open_window(
+                    root=self.view.master,
+                    new_view=views.FileDownloaderView,
+                    new_controller=controllers.FileDownloaderController,
+                    height_ratio=self.pgn_height,
+                    width_factor=self.pgn_width,
+                    top_level=True
+                )
+        )  # TODO disable menu
 
         # video frame commands
         video_frame = self.view.frames["video"]
