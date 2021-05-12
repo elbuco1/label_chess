@@ -42,6 +42,7 @@ def open_window(root, new_view, new_controller,
     if top_level:
         window = tk.Toplevel(root)
         window.attributes('-topmost', True)
+        # root.iconify()
 
     # height is a proportion of the screen
     height = int(window.winfo_screenheight() * height_ratio)
@@ -86,31 +87,6 @@ class ChessFenAnnotatorController(Controller):
         # side_menu.buttons["pgn"].configure(command=self.load_pgn)
         # side_menu.buttons["reset"].configure(command=self.reset_app)
 
-        # menu commands
-        self.view.menus[
-            "download"].entryconfigure(
-                "Video", command=lambda: controllers.open_window(
-                    root=self.view.master,
-                    new_view=views.VideoDownloaderView,
-                    new_controller=controllers.VideoDownloaderController,
-                    height_ratio=self.video_height,
-                    width_factor=self.video_width,
-                    top_level=True
-                )
-        )
-
-        self.view.menus[
-            "download"].entryconfigure(
-                "PGN", command=lambda: controllers.open_window(
-                    root=self.view.master,
-                    new_view=views.FileDownloaderView,
-                    new_controller=controllers.FileDownloaderController,
-                    height_ratio=self.pgn_height,
-                    width_factor=self.pgn_width,
-                    top_level=True
-                )
-        )  # TODO disable menu
-
         # video frame commands
         video_frame = self.view.frames["video"]
         video_frame.buttons["next_frame"].configure(
@@ -121,11 +97,33 @@ class ChessFenAnnotatorController(Controller):
             command=self.save_frame)
         video_frame.buttons["unsave_frame"].configure(
             command=self.unsave_frame)
+        # open download video window
+        video_frame.buttons["add_video"].configure(
+            command=lambda: controllers.open_window(
+                    root=self.view.master,
+                    new_view=views.VideoDownloaderView,
+                    new_controller=controllers.VideoDownloaderController,
+                    height_ratio=self.video_height,
+                    width_factor=self.video_width,
+                    top_level=True
+                )
+        )
 
         # pgn frame commands
         pgn_frame = self.view.frames["pgn"]
         pgn_frame.buttons["skip_fen"].configure(
             command=self.get_next_fen)
+        # open download pgn window
+        pgn_frame.buttons["add_pgn"].configure(
+            command=lambda: controllers.open_window(
+                    root=self.view.master,
+                    new_view=views.FileDownloaderView,
+                    new_controller=controllers.FileDownloaderController,
+                    height_ratio=self.pgn_height,
+                    width_factor=self.pgn_width,
+                    top_level=True
+                )
+        )
 
         self.setup_keyboard_shortcuts()
 

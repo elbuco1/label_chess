@@ -6,7 +6,7 @@ from chlabel import utils, chess2fen
 
 
 class ChessFenAnnotatorView(View):
-    def __init__(self, master=None, img_prop=0.8):
+    def __init__(self, master=None, img_prop=0.85):
         super().__init__(master)
         self.master = master
         self.img_prop = img_prop
@@ -17,57 +17,36 @@ class ChessFenAnnotatorView(View):
         self.menus = {}
 
     def create_view(self):
-        self.container = tk.Frame(master=self)
-        self.container.rowconfigure(0,  weight=1)
-        self.container.columnconfigure(0, weight=1)
-        self.container.columnconfigure(1, weight=1)
-        self.container.grid(row=0, column=0, sticky="nsew")
+        self.frames["annotation"] = AnnotationsFrame(self)
+        self.frames["annotation"].create_view()
+        self.frames["annotation"].grid(row=0, column=0, sticky="nsew")
 
-        self.frames["pgn"] = PGNFrame(self.container,
+
+        self.container = tk.Frame(master=self)
+        self.container.rowconfigure(0,  weight=5)
+        self.container.rowconfigure(1,  weight=1)
+        self.container.columnconfigure(0, weight=1)
+        self.container.grid(row=0, column=1, sticky="nsew")
+
+        # middle
+        self.imgs = tk.Frame(master=self.container)
+        self.imgs.rowconfigure(0,  weight=1)
+        self.imgs.columnconfigure([0,1], weight=1)
+        self.imgs.grid(row=0, column=0, sticky="nsew")
+
+        self.frames["pgn"] = PGNFrame(self.imgs,
                                       img_prop=self.img_prop)
         self.frames["pgn"].create_view()
         self.frames["pgn"].grid(row=0, column=0, sticky="nsew")
 
-        self.frames["video"] = VideoFrame(self.container,
+        self.frames["video"] = VideoFrame(self.imgs,
                                           img_prop=self.img_prop)
         self.frames["video"].create_view()
         self.frames["video"].grid(row=0, column=1, sticky="nsew")
 
-        self.buttons["start_button"] = tk.Button(self, text="START")
+        # bottom
+        self.buttons["start_button"] = tk.Button(self.container, text="START")
         self.buttons["start_button"].grid(row=1, column=0, sticky="nsew")
-
-        self.add_menu()
-        # self.disable_menu()
-
-    def add_menu(self):
-        self.menus["main"] = tk.Menu(self.master)
-        self.menus["annotations"] = tk.Menu(self.menus["main"])
-        self.menus["main"].add_cascade(label="Annotations",
-                                       menu=self.menus["annotations"])
-        self.menus["annotations"].add_command(
-            label="New", command=lambda: None)
-        self.menus["annotations"].add_command(
-            label="Save", command=lambda: None)
-        self.menus["annotations"].add_command(
-            label="Load", command=lambda: None)
-        self.menus["annotations"].add_command(
-            label="Export", command=lambda: None)
-
-        self.menus["download"] = tk.Menu(self.menus["main"])
-        self.menus["main"].add_cascade(
-            label="Download", menu=self.menus["download"])
-        self.menus["download"].add_command(label="Video", command=lambda: None)
-        self.menus["download"].add_command(label="PGN", command=lambda: None)
-        self.master.config(menu=self.menus["main"])
-
-    # TODO disable menu
-    def disable_menu(self):
-        self.menus["main"].entryconfig("Annotations", state="disabled")
-        self.menus["main"].entryconfig("Download", state="disabled")
-
-    def enable_menu(self):
-        self.menus["main"].entryconfig("Annotations", state="normal")
-        self.menus["main"].entryconfig("Download", state="normal")
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self
@@ -78,9 +57,57 @@ class ChessFenAnnotatorView(View):
         self.master.title("Chess video FEN annotator")
 
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=5)
-        self.rowconfigure(1, weight=1)
+        self.columnconfigure(1, weight=2)
+
+        self.rowconfigure(0, weight=1)
         self.grid(row=0, column=0, sticky="nsew")
+
+class AnnotationsFrame(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+
+        self.buttons = {}
+        self.labels = {}
+        self.string_vars = {}
+
+        self.config_window()
+
+    def create_view(self):
+        # Label frame container
+        self.container = tk.LabelFrame(master=self, text="Annotations")
+        self.container.columnconfigure(0,  weight=1)
+        self.container.grid(row=0, column=0, sticky="nsew")
+
+        self.buttons["new_ann"] = tk.Button(
+            master=self.container, text="New")
+        self.buttons["new_ann"].grid(row=0, column=0, sticky="ew")
+
+        
+        self.buttons["load_ann"] = tk.Button(
+            master=self.container, text="Load")
+        self.buttons["load_ann"].grid(row=1, column=0, sticky="ew")
+
+        self.buttons["save_ann"] = tk.Button(
+            master=self.container, text="Save")
+        self.buttons["save_ann"].grid(row=2, column=0, sticky="ew")
+
+        self.buttons["export_ann"] = tk.Button(
+            master=self.container, text="Export")
+        self.buttons["export_ann"].grid(row=3, column=0, sticky="ew")
+
+    def config_window(self):
+        """Configure app's root node (tk.Tk()) i.e. self
+        """
+        self.rowconfigure(0,  weight=1)
+        self.columnconfigure(0, weight=1)
+        self.grid(row=0, column=0, sticky="nsew")
+
+    def activate_button(self, name):
+        self.buttons[name]["state"] = "normal"
+
+    def disable_button(self, name):
+        self.buttons[name]["state"] = "disabled"
 
 
 class PGNFrame(tk.Frame):
@@ -103,14 +130,22 @@ class PGNFrame(tk.Frame):
         self.container.columnconfigure(0,  weight=1)
         self.container.grid(row=0, column=0, sticky="nsew")
 
+        self.select_frm = tk.Frame(master=self.container)
+        self.select_frm.rowconfigure(0,  weight=1)
+        self.select_frm.columnconfigure(0,  weight=1)
+        self.select_frm.columnconfigure(1,  weight=3)
+        self.select_frm.grid(row=0, column=0, sticky="nsew")
+        # add pgn
+        self.buttons["add_pgn"] = tk.Button(master=self.select_frm, text="Download pgn")
+        self.buttons["add_pgn"].grid(row=0, column=0, sticky="nsew")
         # select pgn
-        self.string_vars["pgn"] = tk.StringVar(self.container)
-        self.string_vars["pgn"].set("Select pgn...")
-        self.buttons["pgn"] = tk.OptionMenu(master=self.container,
-                                            variable=self.string_vars["pgn"],
+        self.string_vars["select_pgn"] = tk.StringVar(self.select_frm)
+        self.string_vars["select_pgn"].set("Select pgn...")
+        self.buttons["select_pgn"] = tk.OptionMenu(master=self.select_frm,
+                                            variable=self.string_vars["select_pgn"],
                                             value='Select pgn...')
-        self.disable_button("pgn")
-        self.buttons["pgn"].grid(row=0, column=0, sticky="nsew")
+        self.disable_button("select_pgn")
+        self.buttons["select_pgn"].grid(row=0, column=1, sticky="nsew")
 
         # chess fen
         self.labels["fen"] = tk.Label(
@@ -189,12 +224,20 @@ class VideoFrame(tk.Frame):
         self.container.columnconfigure(0, weight=1)
         self.container.grid(row=0, column=0, sticky="nsew")
 
+        # add and select video
         # select video and fps
+
         self.selection_frm = tk.Frame(master=self.container)
-        self.selection_frm.columnconfigure(0, weight=5)
-        self.selection_frm.columnconfigure(1, weight=1)
+        self.selection_frm.columnconfigure(0, weight=1)
+        self.selection_frm.columnconfigure(1, weight=2)
+        self.selection_frm.columnconfigure(2, weight=1)
         self.selection_frm.rowconfigure(0,  weight=1)
         self.selection_frm.grid(row=0, column=0, sticky="nsew")
+
+        # add video
+        self.buttons["add_video"] = tk.Button(
+            master=self.selection_frm, text="Download video")
+        self.buttons["add_video"].grid(row=0, column=0, sticky="nsew")
 
         # select video
         self.string_vars["video"] = tk.StringVar(self.selection_frm)
@@ -203,7 +246,7 @@ class VideoFrame(tk.Frame):
                                               variable=self.string_vars["video"],
                                               value='Select video...')
         self.disable_button("video")
-        self.buttons["video"].grid(row=0, column=0, sticky="nsew")
+        self.buttons["video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
         self.string_vars["fps"] = tk.StringVar(self.selection_frm)
@@ -212,7 +255,7 @@ class VideoFrame(tk.Frame):
                                             variable=self.string_vars["fps"],
                                             value='FPS ratio...')
         self.disable_button("fps")
-        self.buttons["fps"].grid(row=0, column=1, sticky="nsew")
+        self.buttons["fps"].grid(row=0, column=2, sticky="nsew")
         # video image
         self.labels["frame"] = tk.Label(
             master=self.container)
@@ -296,70 +339,6 @@ class VideoFrame(tk.Frame):
         image_height = int(self.img_prop*height)
         image = utils.resize_image(self.image, image_height)
         self.display_image(image)
-
-    def activate_button(self, name):
-        self.buttons[name]["state"] = "normal"
-
-    def disable_button(self, name):
-        self.buttons[name]["state"] = "disabled"
-
-
-class SideMenuFrame(tk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.master = master
-
-        self.buttons = {}
-        self.string_vars = {}
-
-        self.fps_ratios = [str(i+1) for i in range(10)]
-
-        self.config_window()
-
-    def create_view(self):
-        # Label frame container
-        self.container = tk.LabelFrame(master=self, text="Menu")
-        self.container.columnconfigure(0, weight=1)
-        self.container.grid(row=0, column=0, sticky="nsew")
-
-        # save directory button
-        self.buttons["save_dir"] = tk.Button(
-            master=self.container, text="Save dir...")
-        self.buttons["save_dir"].grid(row=0, column=0, sticky="new")
-
-        # fps ratio option menu
-        self.string_vars["fps"] = tk.StringVar(self.container)
-        self.string_vars["fps"].set("FPS ratio...")
-        self.buttons["fps"] = tk.OptionMenu(self.container,
-                                            self.string_vars["fps"],
-                                            *self.fps_ratios
-                                            )
-        self.disable_button("fps")
-        self.buttons["fps"].grid(row=1, column=0, sticky="new")
-
-        # load video button
-        self.buttons["video"] = tk.Button(
-            master=self.container, text="Load video",
-            state="disabled")
-        self.buttons["video"].grid(row=2, column=0, sticky="new")
-
-        # load pgn button
-        self.buttons["pgn"] = tk.Button(
-            master=self.container, text="Load PGN",
-            state="disabled")
-        self.buttons["pgn"].grid(row=3, column=0, sticky="new")
-
-        # reset button
-        self.buttons["reset"] = tk.Button(
-            master=self.container, text="Reset")
-        self.buttons["reset"].grid(row=4, column=0, sticky="sew")
-
-    def config_window(self):
-        """Configure app's root node (tk.Tk()) i.e. self
-        """
-        self.rowconfigure(0,  weight=1)
-        self.columnconfigure(0, weight=1)
-        self.grid(row=0, column=0, sticky="nsew")
 
     def activate_button(self, name):
         self.buttons[name]["state"] = "normal"

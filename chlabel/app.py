@@ -6,7 +6,7 @@ class ChessAnnotatorApp(tk.Tk):
     """App's entrypoint
     """
 
-    def __init__(self, width=2.3, height=4/7):
+    def __init__(self, width=2.5, height=4/7):
         super().__init__()
         controllers.open_window(
             root=self,
