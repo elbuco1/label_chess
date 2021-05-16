@@ -4,6 +4,7 @@ from tkinter import messagebox
 import os
 
 from chlabel import utils
+from chlabel.gui import models
 from .base import Controller
 
 
@@ -31,6 +32,13 @@ class VideoDownloaderController(Controller):
             return
 
         url = self.view.entries["URL"].get()
+
+        if self.video_exists(url):
+            messagebox.showwarning("Already exists",
+                                   f"Video from url: '{url}'"
+                                   "already exists in database")
+            return
+
         if len(url) > 0:
             file_path = self.select_save_dir()
             if file_path is not None:
@@ -58,6 +66,13 @@ class VideoDownloaderController(Controller):
                                          f"to '{file_path}'."
                                          )
                     return
+                # insert new video object in database
+                new_video = models.Video(
+                    url=url,
+                    path=file_path
+                )
+                self.persist_video(new_video)
+
                 messagebox.showinfo("Download completed",
                                     f"Video at url: '{url}' with resolution '{self.res}' "
                                     "has been downloaded "
@@ -68,6 +83,28 @@ class VideoDownloaderController(Controller):
             messagebox.showwarning("Invalid url",
                                    "Please enter a url")
             return
+
+    def video_exists(self, url):
+        """Check if video url is already
+        in database.
+
+        Args:
+            url (str)
+        """
+        db = models.get_db()
+        urls = db.query(models.Video.url).all()
+        urls = {e[0] for e in urls}
+        return url in urls
+
+    def persist_video(self, video):
+        """Add video object to db.
+
+        Args:
+            video (models.Video): video object
+        """
+        db = models.get_db()
+        db.add(video)
+        db.commit()
 
     def select_save_dir(self):
         files = [
