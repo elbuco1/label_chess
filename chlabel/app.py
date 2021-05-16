@@ -1,5 +1,6 @@
 import tkinter as tk
-from chlabel.gui import controllers, views
+from chlabel.gui import controllers, views, models
+import argparse
 
 
 class ChessAnnotatorApp(tk.Tk):
@@ -18,5 +19,13 @@ class ChessAnnotatorApp(tk.Tk):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-r', "--reset_db", help='Clear database',
+        default=False, action='store_true')
+    args = parser.parse_args()
+
+    models.init_db(clear=args.reset_db)
+
     app = ChessAnnotatorApp()
     app.mainloop()
