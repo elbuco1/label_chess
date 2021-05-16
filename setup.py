@@ -19,7 +19,7 @@ def list_reqs(fname='requirements.txt'):
 
 
 INSTALL_REQUIRES = list_reqs(fname='requirements.txt')
-TEST_REQUIRES = list_reqs(fname='requirements-test.txt')
+# TEST_REQUIRES = list_reqs(fname='requirements-test.txt')
 
 here = os.path.abspath(os.path.dirname(__file__))
 
