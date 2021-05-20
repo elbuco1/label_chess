@@ -21,7 +21,6 @@ class ChessFenAnnotatorView(View):
         self.frames["annotation"].create_view()
         self.frames["annotation"].grid(row=0, column=0, sticky="nsew")
 
-
         self.container = tk.Frame(master=self)
         self.container.rowconfigure(0,  weight=5)
         self.container.rowconfigure(1,  weight=1)
@@ -31,7 +30,7 @@ class ChessFenAnnotatorView(View):
         # middle
         self.imgs = tk.Frame(master=self.container)
         self.imgs.rowconfigure(0,  weight=1)
-        self.imgs.columnconfigure([0,1], weight=1)
+        self.imgs.columnconfigure([0, 1], weight=1)
         self.imgs.grid(row=0, column=0, sticky="nsew")
 
         self.frames["pgn"] = PGNFrame(self.imgs,
@@ -62,6 +61,7 @@ class ChessFenAnnotatorView(View):
         self.rowconfigure(0, weight=1)
         self.grid(row=0, column=0, sticky="nsew")
 
+
 class AnnotationsFrame(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -83,7 +83,6 @@ class AnnotationsFrame(tk.Frame):
             master=self.container, text="New")
         self.buttons["new_ann"].grid(row=0, column=0, sticky="ew")
 
-        
         self.buttons["load_ann"] = tk.Button(
             master=self.container, text="Load")
         self.buttons["load_ann"].grid(row=1, column=0, sticky="ew")
@@ -136,14 +135,15 @@ class PGNFrame(tk.Frame):
         self.select_frm.columnconfigure(1,  weight=3)
         self.select_frm.grid(row=0, column=0, sticky="nsew")
         # add pgn
-        self.buttons["add_pgn"] = tk.Button(master=self.select_frm, text="Download pgn")
+        self.buttons["add_pgn"] = tk.Button(
+            master=self.select_frm, text="Download pgn")
         self.buttons["add_pgn"].grid(row=0, column=0, sticky="nsew")
         # select pgn
         self.string_vars["select_pgn"] = tk.StringVar(self.select_frm)
         self.string_vars["select_pgn"].set("Select pgn...")
         self.buttons["select_pgn"] = tk.OptionMenu(master=self.select_frm,
-                                            variable=self.string_vars["select_pgn"],
-                                            value='Select pgn...')
+                                                   variable=self.string_vars["select_pgn"],
+                                                   value='Select pgn...')
         self.disable_button("select_pgn")
         self.buttons["select_pgn"].grid(row=0, column=1, sticky="nsew")
 
@@ -245,7 +245,8 @@ class VideoFrame(tk.Frame):
         self.buttons["video"] = tk.OptionMenu(master=self.selection_frm,
                                               variable=self.string_vars["video"],
                                               value='Select video...')
-        self.disable_button("video")
+        # https://stackoverflow.com/questions/7393430/how-can-i-dynamic-populate-an-option-widget-in-tkinter-depending-on-a-choice-fro/7403530#7403530
+        # self.disable_button("video")
         self.buttons["video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
@@ -327,6 +328,19 @@ class VideoFrame(tk.Frame):
         """
         self.image = image
         self.display_image(image)
+
+    def update_video_list(self, options):
+        """Change list of video in the menu button
+
+        Args:
+            options (list of str): list of video ids
+        """
+        menu = self.buttons["video"]["menu"]
+        menu.delete(0, "end")
+        for string in options:
+            menu.add_command(label=string,
+                             command=lambda value=string:
+                             self.string_vars["video"].set(value))
 
     def resize_image(self, height):
         """Resize video image based on new height.

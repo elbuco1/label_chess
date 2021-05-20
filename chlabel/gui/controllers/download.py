@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 import os
+import traceback
 
 from chlabel import utils
 from chlabel.gui import models
@@ -58,13 +59,15 @@ class VideoDownloaderController(Controller):
                         file_extension=ext,
                         res=self.res
                     )
-                    # TODO return res, if different info box
+                # TODO return res, if different info box
                 except Exception:
+                    traceback.print_exc()
                     messagebox.showerror("Download failed",
                                          f"Video at url: '{url}' with resolution '{self.res}' "
                                          "could not be downloaded "
                                          f"to '{file_path}'."
                                          )
+
                     return
                 # insert new video object in database
                 new_video = models.Video(

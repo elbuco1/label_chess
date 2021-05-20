@@ -9,7 +9,7 @@ import shutil
 
 from chlabel import utils, chess2fen
 from .base import Controller
-from chlabel.gui import views, controllers
+from chlabel.gui import views, controllers, models
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
@@ -78,17 +78,11 @@ class ChessFenAnnotatorController(Controller):
         self.view = view
         self.view.create_view()
 
-        # # side menu commands
-        # side_menu = self.view.frames["side_menu"]
-        # side_menu.string_vars["fps"].trace(
-        #     "w", self.select_fps)
-        # side_menu.buttons["save_dir"].configure(command=self.select_save_dir)
-        # side_menu.buttons["video"].configure(command=self.load_video)
-        # side_menu.buttons["pgn"].configure(command=self.load_pgn)
-        # side_menu.buttons["reset"].configure(command=self.reset_app)
-
         # video frame commands
         video_frame = self.view.frames["video"]
+        video_frame.buttons["video"].configure(
+            command=self.populate_menu_buttons())
+
         video_frame.buttons["next_frame"].configure(
             command=self.get_next_frame)
         video_frame.buttons["previous_frame"].configure(
@@ -100,13 +94,13 @@ class ChessFenAnnotatorController(Controller):
         # open download video window
         video_frame.buttons["add_video"].configure(
             command=lambda: controllers.open_window(
-                    root=self.view.master,
-                    new_view=views.VideoDownloaderView,
-                    new_controller=controllers.VideoDownloaderController,
-                    height_ratio=self.video_height,
-                    width_factor=self.video_width,
-                    top_level=True
-                )
+                root=self.view.master,
+                new_view=views.VideoDownloaderView,
+                new_controller=controllers.VideoDownloaderController,
+                height_ratio=self.video_height,
+                width_factor=self.video_width,
+                top_level=True
+            )
         )
 
         # pgn frame commands
@@ -116,16 +110,17 @@ class ChessFenAnnotatorController(Controller):
         # open download pgn window
         pgn_frame.buttons["add_pgn"].configure(
             command=lambda: controllers.open_window(
-                    root=self.view.master,
-                    new_view=views.FileDownloaderView,
-                    new_controller=controllers.FileDownloaderController,
-                    height_ratio=self.pgn_height,
-                    width_factor=self.pgn_width,
-                    top_level=True
-                )
+                root=self.view.master,
+                new_view=views.FileDownloaderView,
+                new_controller=controllers.FileDownloaderController,
+                height_ratio=self.pgn_height,
+                width_factor=self.pgn_width,
+                top_level=True
+            )
         )
 
         self.setup_keyboard_shortcuts()
+        # self.populate_menu_buttons()
 
     def setup_variables(self):
         self.frames = []
@@ -173,6 +168,12 @@ class ChessFenAnnotatorController(Controller):
             video_btns["unsave_frame"], self.flash_dur), add="+")
         self.view.master.bind('<space>', lambda event: self.flash(
             pgn_btns["skip_fen"], self.flash_dur), add="+")
+
+    def populate_menu_buttons(self):
+        db = models.get_db()
+        urls = db.query(models.Video.url).all()
+        urls = [e[0] for e in urls]
+        self.view.frames["video"].update_video_list(urls)
 
     def resize_image(self, frame, event):
         """Assuming a view that posess a method
