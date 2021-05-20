@@ -1,3 +1,6 @@
+# TODO download library youtube fails
+# it should not be the entrypoint of the app
+# to risky
 # TODO force aspect ratio when resizing window
 # TODO save in csv (use Model from MVC pattern)
 # TODO initialization scheme of database (create tables)
