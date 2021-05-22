@@ -1,50 +1,34 @@
 import tkinter as tk
-from .base import View
+from chlabel.gui.base import View
 
 
-class VideoDownloaderView(View):
+class VideoLoaderView(View):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
 
-        self.resolutions = ["1080p",
-                            "720p",
-                            "480p",
-                            "360p"]
         self.entries = {}
         self.buttons = {}
-        self.string_vars = {}
 
         self.config_window()
 
     def create_view(self):
         """Create all app's widgets
         """
+        self.buttons["select_video"] = tk.Button(self, text="Select video")
+        self.buttons["select_video"].grid(row=0, column=0, sticky="nsew")
+
         # URL entry
         frm_label = "URL"
         self.frm_url = self.create_label_frame(frm_label)
         self.entries[frm_label] = tk.Entry(
             self.frm_url)
         self.entries[frm_label].grid(row=0, column=0, sticky="nsew")
-        self.frm_url.grid(row=0, column=0, sticky="nsew")
+        self.frm_url.grid(row=1, column=0, sticky="nsew")
 
-        # Resolution option menu
-        frm_label = "Resolution"
-        self.frm_res = self.create_label_frame(frm_label)
-        self.string_vars[frm_label] = tk.StringVar(self)
-        self.res_menu = tk.OptionMenu(
-            self.frm_res,
-            self.string_vars[frm_label],
-            *self.resolutions
-        )
-        self.res_menu.grid(row=0, column=0, sticky="nsew")
-        self.frm_res.grid(row=1, column=0,
-                          sticky="nsew")
-
-        # Download menu
-        btn_name = "Download"
-        self.buttons[btn_name] = tk.Button(self, text=btn_name)
-        self.buttons[btn_name].grid(row=2, column=0, sticky="nsew")
+        # Add button
+        self.buttons["Add"] = tk.Button(self, text="Add")
+        self.buttons["Add"].grid(row=2, column=0, sticky="nsew")
 
     def create_label_frame(self, text):
         frm = tk.LabelFrame(self, text=text)
@@ -58,14 +42,14 @@ class VideoDownloaderView(View):
         self.master.resizable(width=True, height=False)
         self.master.rowconfigure(0,  weight=1)
         self.master.columnconfigure(0, weight=1)
-        self.master.title("Youtube video downloader")
+        self.master.title("Add video to database")
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure([0, 1, 2], weight=1)
         self.grid(row=0, column=0, sticky="nsew")
 
 
-class FileDownloaderView(View):
+class PGNLoaderView(View):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
@@ -78,18 +62,21 @@ class FileDownloaderView(View):
     def create_view(self):
         """Create all app's widgets
         """
+
+        self.buttons["select_pgn"] = tk.Button(self, text="Select PGN")
+        self.buttons["select_pgn"].grid(row=0, column=0, sticky="nsew")
+
         # URL entry
         frm_label = "URL"
         self.frm_url = tk.LabelFrame(self, text=frm_label)
         self.frm_url.columnconfigure(0, weight=1)
         self.entries[frm_label] = tk.Entry(self.frm_url)
         self.entries[frm_label].grid(row=0, column=0, sticky="nsew")
-        self.frm_url.grid(row=0, column=0, sticky="nsew")
+        self.frm_url.grid(row=1, column=0, sticky="nsew")
 
         # Download menu
-        btn_name = "Download"
-        self.buttons[btn_name] = tk.Button(self, text=btn_name)
-        self.buttons[btn_name].grid(row=1, column=0, sticky="nsew")
+        self.buttons["Add"] = tk.Button(self, text="Add")
+        self.buttons["Add"].grid(row=2, column=0, sticky="nsew")
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e., self
@@ -98,8 +85,8 @@ class FileDownloaderView(View):
         self.master.resizable(width=True, height=False)
         self.master.rowconfigure(0, weight=1)
         self.master.columnconfigure(0, weight=1)
-        self.master.title("PGN downloader")
+        self.master.title("Add PGN to database")
         # resizable view
         self.columnconfigure(0, weight=1)
-        self.rowconfigure([0, 1], weight=1)
+        self.rowconfigure([0, 1, 2], weight=1)
         self.grid(row=0, column=0, sticky="nsew")

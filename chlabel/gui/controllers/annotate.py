@@ -8,7 +8,7 @@ import json
 import shutil
 
 from chlabel import utils, chess2fen
-from .base import Controller
+from chlabel.gui.base import Controller
 from chlabel.gui import views, controllers, models
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
@@ -68,10 +68,10 @@ class ChessFenAnnotatorController(Controller):
         self.popup_dur = 1000
         self.flash_dur = 100
 
-        self.video_height = 1/8
-        self.video_width = 2.2
+        self.video_height = 1/9
+        self.video_width = 3
 
-        self.pgn_height = 1/12
+        self.pgn_height = 1/9
         self.pgn_width = 3
 
     def bind_view(self, view):
@@ -95,8 +95,8 @@ class ChessFenAnnotatorController(Controller):
         video_frame.buttons["add_video"].configure(
             command=lambda: controllers.open_window(
                 root=self.view.master,
-                new_view=views.VideoDownloaderView,
-                new_controller=controllers.VideoDownloaderController,
+                new_view=views.VideoLoaderView,
+                new_controller=controllers.VideoLoaderController,
                 height_ratio=self.video_height,
                 width_factor=self.video_width,
                 top_level=True
@@ -111,8 +111,8 @@ class ChessFenAnnotatorController(Controller):
         pgn_frame.buttons["add_pgn"].configure(
             command=lambda: controllers.open_window(
                 root=self.view.master,
-                new_view=views.FileDownloaderView,
-                new_controller=controllers.FileDownloaderController,
+                new_view=views.PGNLoaderView,
+                new_controller=controllers.PGNLoaderController,
                 height_ratio=self.pgn_height,
                 width_factor=self.pgn_width,
                 top_level=True

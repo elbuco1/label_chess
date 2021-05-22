@@ -52,3 +52,12 @@ class Video(BASE, Repr_MIXIN):
     url = Column(String, primary_key=True)
     # path to the video on disk
     path = Column(String)
+
+
+class PGN(BASE, Repr_MIXIN):
+    __tablename__ = "pgn"
+    # pgn url used as primary key as it should
+    # be unique
+    url = Column(String, primary_key=True)
+    # path to the pgn on disk
+    path = Column(String)

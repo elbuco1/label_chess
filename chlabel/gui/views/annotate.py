@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from .base import View
+from chlabel.gui.base import View
 from chlabel import utils, chess2fen
 
 
@@ -136,7 +136,7 @@ class PGNFrame(tk.Frame):
         self.select_frm.grid(row=0, column=0, sticky="nsew")
         # add pgn
         self.buttons["add_pgn"] = tk.Button(
-            master=self.select_frm, text="Download pgn")
+            master=self.select_frm, text="Add pgn")
         self.buttons["add_pgn"].grid(row=0, column=0, sticky="nsew")
         # select pgn
         self.string_vars["select_pgn"] = tk.StringVar(self.select_frm)
@@ -144,7 +144,7 @@ class PGNFrame(tk.Frame):
         self.buttons["select_pgn"] = tk.OptionMenu(master=self.select_frm,
                                                    variable=self.string_vars["select_pgn"],
                                                    value='Select pgn...')
-        self.disable_button("select_pgn")
+        # self.disable_button("select_pgn")
         self.buttons["select_pgn"].grid(row=0, column=1, sticky="nsew")
 
         # chess fen
@@ -236,7 +236,7 @@ class VideoFrame(tk.Frame):
 
         # add video
         self.buttons["add_video"] = tk.Button(
-            master=self.selection_frm, text="Download video")
+            master=self.selection_frm, text="Add video")
         self.buttons["add_video"].grid(row=0, column=0, sticky="nsew")
 
         # select video
@@ -255,7 +255,7 @@ class VideoFrame(tk.Frame):
         self.buttons["fps"] = tk.OptionMenu(master=self.selection_frm,
                                             variable=self.string_vars["fps"],
                                             value='FPS ratio...')
-        self.disable_button("fps")
+        # self.disable_button("fps")
         self.buttons["fps"].grid(row=0, column=2, sticky="nsew")
         # video image
         self.labels["frame"] = tk.Label(
