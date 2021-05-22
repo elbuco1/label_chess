@@ -70,6 +70,8 @@ class Video(BASE, Repr_MIXIN):
     original_path = Column(String)
     # path where the video is copied
     path = Column(String)
+    # title of the video
+    name = Column(String)
 
 
 class PGN(BASE, Repr_MIXIN):
@@ -81,3 +83,5 @@ class PGN(BASE, Repr_MIXIN):
     path = Column(String)
     # path from where the pgn file is loaded
     original_path = Column(String)
+    # name of the game
+    name = Column(String)

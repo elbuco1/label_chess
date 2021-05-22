@@ -46,11 +46,14 @@ class VideoLoaderController(Controller):
         video_name = os.path.split(self.video_path)[-1]
         db_path = os.path.join(models.VIDEO_DATA_DIR,
                                video_name)
+
+        video_name = video_name.replace(" ", "_").lower()
         new_video = models.Video(
             url=url,
             original_path=self.video_path,
-            path=db_path
-        )
+            path=db_path,
+            name=video_name)
+
         self.persist_video(new_video,
                            original_path=self.video_path,
                            db_path=db_path)
@@ -128,10 +131,12 @@ class PGNLoaderController(Controller):
         db_path = os.path.join(models.PGN_DATA_DIR,
                                pgn_name)
 
+        pgn_name = pgn_name.replace(" ", "_").lower()
         new_pgn = models.PGN(
             url=url,
             original_path=self.pgn_path,
-            path=db_path
+            path=db_path,
+            name=pgn_name
         )
         self.persist_pgn(new_pgn,
                          original_path=self.pgn_path,

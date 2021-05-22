@@ -110,10 +110,11 @@ class AnnotationsFrame(tk.Frame):
 
 
 class PGNFrame(tk.Frame):
-    def __init__(self, master=None, img_prop=0.9):
+    def __init__(self, master=None, img_prop=0.9, max_chars_pgn_list=40):
         super().__init__(master)
         self.master = master
         self.img_prop = img_prop
+        self.max_chars_pgn_list = max_chars_pgn_list
 
         self.buttons = {}
         self.labels = {}
@@ -197,6 +198,20 @@ class PGNFrame(tk.Frame):
         image = utils.resize_image(self.image, image_height)
         self.display_image(image)
 
+    def update_pgn_list(self, options):
+        """Change list of pgn in the menu button
+
+        Args:
+            options (list of str): list of pgn ids
+        """
+        if len(options) > 0:
+            menu = self.buttons["select_pgn"]["menu"]
+            menu.delete(0, "end")
+            for option in options:
+                menu.add_command(label=option,
+                                 command=lambda value=option[:self.max_chars_pgn_list]:
+                                 self.string_vars["select_pgn"].set(value))
+
     def activate_button(self, name):
         self.buttons[name]["state"] = "normal"
 
@@ -205,10 +220,12 @@ class PGNFrame(tk.Frame):
 
 
 class VideoFrame(tk.Frame):
-    def __init__(self, master=None, img_prop=0.9):
+    def __init__(self, master=None, img_prop=0.9,
+                 max_chars_vid_list=80):
         super().__init__(master)
         self.master = master
         self.img_prop = img_prop
+        self.max_chars_vid_list = max_chars_vid_list
 
         self.buttons = {}
         self.labels = {}
@@ -240,14 +257,14 @@ class VideoFrame(tk.Frame):
         self.buttons["add_video"].grid(row=0, column=0, sticky="nsew")
 
         # select video
-        self.string_vars["video"] = tk.StringVar(self.selection_frm)
-        self.string_vars["video"].set("Select video...")
-        self.buttons["video"] = tk.OptionMenu(master=self.selection_frm,
-                                              variable=self.string_vars["video"],
-                                              value='Select video...')
+        self.string_vars["select_video"] = tk.StringVar(self.selection_frm)
+        self.string_vars["select_video"].set("Select video...")
+        self.buttons["select_video"] = tk.OptionMenu(master=self.selection_frm,
+                                                     variable=self.string_vars["select_video"],
+                                                     value='Select video...')
         # https://stackoverflow.com/questions/7393430/how-can-i-dynamic-populate-an-option-widget-in-tkinter-depending-on-a-choice-fro/7403530#7403530
         # self.disable_button("video")
-        self.buttons["video"].grid(row=0, column=1, sticky="nsew")
+        self.buttons["select_video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
         self.string_vars["fps"] = tk.StringVar(self.selection_frm)
@@ -335,12 +352,13 @@ class VideoFrame(tk.Frame):
         Args:
             options (list of str): list of video ids
         """
-        menu = self.buttons["video"]["menu"]
-        menu.delete(0, "end")
-        for string in options:
-            menu.add_command(label=string,
-                             command=lambda value=string:
-                             self.string_vars["video"].set(value))
+        if len(options) > 0:
+            menu = self.buttons["select_video"]["menu"]
+            menu.delete(0, "end")
+            for option in options:
+                menu.add_command(label=option,
+                                 command=lambda value=option[:self.max_chars_vid_list]:
+                                 self.string_vars["select_video"].set(value))
 
     def resize_image(self, height):
         """Resize video image based on new height.

@@ -80,8 +80,11 @@ class ChessFenAnnotatorController(Controller):
 
         # video frame commands
         video_frame = self.view.frames["video"]
-        video_frame.buttons["video"].configure(
-            command=self.populate_menu_buttons())
+
+        video_frame.buttons["select_video"].bind('<Button-1>',
+                                                 lambda event: self.populate_menu_buttons(
+                                                     query=models.Video.name,
+                                                     update_func=video_frame.update_video_list))
 
         video_frame.buttons["next_frame"].configure(
             command=self.get_next_frame)
@@ -105,6 +108,11 @@ class ChessFenAnnotatorController(Controller):
 
         # pgn frame commands
         pgn_frame = self.view.frames["pgn"]
+
+        pgn_frame.buttons["select_pgn"].bind('<Button-1>',
+                                             lambda event: self.populate_menu_buttons(
+                                                 query=models.PGN.name,
+                                                 update_func=pgn_frame.update_pgn_list))
         pgn_frame.buttons["skip_fen"].configure(
             command=self.get_next_fen)
         # open download pgn window
@@ -120,7 +128,6 @@ class ChessFenAnnotatorController(Controller):
         )
 
         self.setup_keyboard_shortcuts()
-        # self.populate_menu_buttons()
 
     def setup_variables(self):
         self.frames = []
@@ -169,11 +176,11 @@ class ChessFenAnnotatorController(Controller):
         self.view.master.bind('<space>', lambda event: self.flash(
             pgn_btns["skip_fen"], self.flash_dur), add="+")
 
-    def populate_menu_buttons(self):
+    def populate_menu_buttons(self, query, update_func):
         db = models.get_db()
-        urls = db.query(models.Video.url).all()
-        urls = [e[0] for e in urls]
-        self.view.frames["video"].update_video_list(urls)
+        names = db.query(query).all()
+        names = [e[0] for e in names]
+        update_func(names)
 
     def resize_image(self, frame, event):
         """Assuming a view that posess a method
