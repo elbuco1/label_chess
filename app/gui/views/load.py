@@ -1,5 +1,5 @@
 import tkinter as tk
-from chlabel.gui.base import View
+from app.gui.base import View
 
 
 class VideoLoaderView(View):

@@ -4,19 +4,35 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String, \
     ForeignKey, Table
 
+import shutil
+import os
+
 DB_PATH = "sqlite:///db.sqlite"
 ENGINE = create_engine(url=DB_PATH)
 SESSION = sessionmaker(bind=ENGINE)
 BASE = declarative_base(bind=ENGINE)
+DB_DATA_DIR = "database"
+VIDEO_DATA_DIR = "video"
+PGN_DATA_DIR = "pgn"
+ANNOTATIONS_DATA_DIR = "annotations"
 
 
 def init_db(clear=False):
-    """Remove every table in db and
-    create all dbs.
-    TODO initialization scheme of database (create tables)
+    """Create database, and data
+    directory.
+
+    If clear is True, database is reset
+    and data directory is emptied.
     """
     if clear:
         BASE.metadata.drop_all()
+        if os.path.exists(DB_DATA_DIR):
+            shutil.rmtree(DB_DATA_DIR)
+
+    os.makedirs(VIDEO_DATA_DIR, exist_ok=True)
+    os.makedirs(PGN_DATA_DIR, exist_ok=True)
+    os.makedirs(ANNOTATIONS_DATA_DIR, exist_ok=True)
+
     BASE.metadata.create_all(checkfirst=True)
 
 

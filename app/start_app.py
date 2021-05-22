@@ -1,5 +1,5 @@
 import tkinter as tk
-from chlabel.gui import controllers, views, models
+from app.gui import controllers, views, models
 import argparse
 
 

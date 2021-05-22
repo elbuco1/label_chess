@@ -3,8 +3,8 @@ from tkinter import filedialog
 from tkinter import messagebox
 import os
 
-from chlabel.gui import models
-from chlabel.gui.base import Controller
+from app.gui import models
+from app.gui.base import Controller
 
 
 class VideoLoaderController(Controller):

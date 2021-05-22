@@ -1,8 +1,8 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from chlabel.gui.base import View
-from chlabel import utils, chess2fen
+from app.gui.base import View
+from app import utils, chess2fen
 
 
 class ChessFenAnnotatorView(View):

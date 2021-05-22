@@ -7,9 +7,9 @@ import pathlib
 import json
 import shutil
 
-from chlabel import utils, chess2fen
-from chlabel.gui.base import Controller
-from chlabel.gui import views, controllers, models
+from app import utils, chess2fen
+from app.gui.base import Controller
+from app.gui import views, controllers, models
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
