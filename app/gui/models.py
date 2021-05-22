@@ -12,9 +12,9 @@ ENGINE = create_engine(url=DB_PATH)
 SESSION = sessionmaker(bind=ENGINE)
 BASE = declarative_base(bind=ENGINE)
 DB_DATA_DIR = "database"
-VIDEO_DATA_DIR = "video"
-PGN_DATA_DIR = "pgn"
-ANNOTATIONS_DATA_DIR = "annotations"
+VIDEO_DATA_DIR = os.path.join(DB_DATA_DIR, "video")
+PGN_DATA_DIR = os.path.join(DB_DATA_DIR, "pgn")
+ANNOTATIONS_DATA_DIR = os.path.join(DB_DATA_DIR, "annotations")
 
 
 def init_db(clear=False):
@@ -66,7 +66,9 @@ class Video(BASE, Repr_MIXIN):
     # video url used as primary key as it should
     # be unique
     url = Column(String, primary_key=True)
-    # path to the video on disk
+    # path from where the video is loaded
+    original_path = Column(String)
+    # path where the video is copied
     path = Column(String)
 
 
@@ -77,3 +79,5 @@ class PGN(BASE, Repr_MIXIN):
     url = Column(String, primary_key=True)
     # path to the pgn on disk
     path = Column(String)
+    # path from where the pgn file is loaded
+    original_path = Column(String)

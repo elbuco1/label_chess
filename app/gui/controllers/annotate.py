@@ -68,11 +68,11 @@ class ChessFenAnnotatorController(Controller):
         self.popup_dur = 1000
         self.flash_dur = 100
 
-        self.video_height = 1/9
-        self.video_width = 3
+        self.video_height = 1/7
+        self.video_width = 2
 
-        self.pgn_height = 1/9
-        self.pgn_width = 3
+        self.pgn_height = 1/7
+        self.pgn_width = 2
 
     def bind_view(self, view):
         self.view = view
