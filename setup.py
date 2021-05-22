@@ -5,7 +5,7 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 # Package meta-data.
-NAME = 'chlabel'
+NAME = 'app'
 DESCRIPTION = 'Desktop app to annotate chessgames'
 URL = 'https://github.com/elbuco1/label_chess'
 EMAIL = 'lrtboucaud@gmail.com'
@@ -53,7 +53,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=('tests',)),
-    package_data={'chlabel': [
+    package_data={'app': [
         'VERSION', 'resources/pieces/*']},
     install_requires=INSTALL_REQUIRES,
     include_package_data=False,
