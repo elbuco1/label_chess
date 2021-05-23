@@ -85,3 +85,16 @@ class PGN(BASE, Repr_MIXIN):
     original_path = Column(String)
     # name of the game
     name = Column(String, unique=True)
+
+
+class Annotation(BASE, Repr_MIXIN):
+    __tablename__ = "annotation"
+    # pgn url used as primary key as it should
+    # be unique
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    # corresponding video
+    video_url = Column(String, ForeignKey('video.url'))
+    # corresponding pgn
+    pgn_url = Column(String, ForeignKey('pgn.url'))
+    # path to csv file containing moves
+    csv_path = Column(String, unique=True)

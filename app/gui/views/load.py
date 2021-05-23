@@ -3,9 +3,10 @@ from app.gui.base import View
 
 
 class VideoLoaderView(View):
-    def __init__(self, master=None):
+    def __init__(self, master=None, height=0):
         super().__init__(master)
         self.master = master
+        self.height = height
 
         self.entries = {}
         self.buttons = {}
@@ -54,9 +55,10 @@ class VideoLoaderView(View):
 
 
 class PGNLoaderView(View):
-    def __init__(self, master=None):
+    def __init__(self, master=None, height=0):
         super().__init__(master)
         self.master = master
+        self.height = height
 
         self.entries = {}
         self.buttons = {}

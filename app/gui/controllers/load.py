@@ -109,7 +109,7 @@ class PGNLoaderController(Controller):
 
     def select_pgn(self):
         self.pgn_path = filedialog.askopenfilename(
-            filetypes=[("All Files", "*.*")]
+            filetypes=[("PGN Files", "*.pgn")]
         )
         if not self.pgn_path:
             return

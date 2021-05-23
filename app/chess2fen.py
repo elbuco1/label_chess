@@ -225,34 +225,8 @@ def get_game_board_images(pgn_path, pieces_path):
         board_array = fen_to_array(fen)
         board_array = rename_pieces(board_array)
         board_copy = draw_pieces(board_copy, pieces, board_array)
-        images.append(board_copy)
-    return images, fens
-
-
-def display_game_as_image(images, presskey=False):
-    """Display positions images of a chess game
-    sequentially.
-
-    Args:
-        images (list of PIL.Image): images of positions
-        presskey (bool, optional): If True, it is required
-            to press a key to pass to the next image. Else
-            it is done automatically after 300 ms.
-            Defaults to False.
-    """
-    for img in images:
-        img = np.array(img)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        cv2.imshow('frame', img)
-        if presskey:
-            key = cv2.waitKey(0) & 0xFF
-        else:
-            key = cv2.waitKey(300) & 0xFF
-        if key == ord('q'):
-            print("Stop simulation.")
-            break
-    cv2.destroyAllWindows()
-
+        images.append([fen, board_copy])
+    return images
 
 # if __name__ == "__main__":
 #     pieces_path = "resources/pieces"

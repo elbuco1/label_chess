@@ -12,6 +12,7 @@ def frames_from_video_generator(video_path, fps_ratio):
 
     Returns:
         list: list of frames
+        int: frame number
     """
     frame_number = 0
 
@@ -22,7 +23,7 @@ def frames_from_video_generator(video_path, fps_ratio):
         if ret:
             if frame_number % fps_ratio == 0:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                yield frame
+                yield [frame, frame_number]
             frame_number += 1
         else:
             break

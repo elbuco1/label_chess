@@ -18,15 +18,11 @@ class ChessFenAnnotatorView(View):
         self.menus = {}
 
     def create_view(self):
-        self.frames["annotation"] = AnnotationsFrame(self)
-        self.frames["annotation"].create_view()
-        self.frames["annotation"].grid(row=0, column=0, sticky="nsew")
-
         self.container = tk.Frame(master=self)
         self.container.rowconfigure(0,  weight=5)
         self.container.rowconfigure(1,  weight=1)
         self.container.columnconfigure(0, weight=1)
-        self.container.grid(row=0, column=1, sticky="nsew")
+        self.container.grid(row=0, column=0, sticky="nsew")
 
         # middle
         self.imgs = tk.Frame(master=self.container)
@@ -47,8 +43,28 @@ class ChessFenAnnotatorView(View):
         self.frames["video"].grid(row=0, column=1, sticky="nsew")
 
         # bottom
-        self.buttons["start_button"] = tk.Button(self.container, text="START")
-        self.buttons["start_button"].grid(row=1, column=0, sticky="nsew")
+        self.bottom_btns = tk.Frame(master=self)
+        self.bottom_btns.rowconfigure(0,  weight=1)
+        self.bottom_btns.columnconfigure([0, 1, 2, 3], weight=1)
+        self.bottom_btns.grid(row=1, column=0, sticky="nsew")
+
+        self.buttons["start_button"] = tk.Button(
+            self.bottom_btns, text="START")
+        self.buttons["start_button"].grid(row=0, column=0, sticky="nsew")
+
+        self.buttons["end_button"] = tk.Button(
+            self.bottom_btns, text="END")
+        self.buttons["end_button"].grid(row=0, column=1, sticky="nsew")
+        self.disable_button("end_button")
+
+        self.buttons["cancel_button"] = tk.Button(
+            self.bottom_btns, text="CANCEL")
+        self.buttons["cancel_button"].grid(row=0, column=2, sticky="nsew")
+        self.disable_button("cancel_button")
+
+        self.buttons["export_button"] = tk.Button(
+            self.bottom_btns, text="EXPORT")
+        self.buttons["export_button"].grid(row=0, column=3, sticky="nsew")
 
     def config_window(self):
         """Configure app's root node (tk.Tk()) i.e. self
@@ -59,56 +75,9 @@ class ChessFenAnnotatorView(View):
         self.master.title("Chess video FEN annotator")
 
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=2)
+        # self.columnconfigure(1, weight=2)
 
         self.rowconfigure(0, weight=1)
-        self.grid(row=0, column=0, sticky="nsew")
-
-    def activate_button(self, name):
-        self.buttons[name]["state"] = "normal"
-
-    def disable_button(self, name):
-        self.buttons[name]["state"] = "disabled"
-
-
-class AnnotationsFrame(tk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.master = master
-
-        self.buttons = {}
-        self.labels = {}
-        self.string_vars = {}
-
-        self.config_window()
-
-    def create_view(self):
-        # Label frame container
-        self.container = tk.LabelFrame(master=self, text="Annotations")
-        self.container.columnconfigure(0,  weight=1)
-        self.container.grid(row=0, column=0, sticky="nsew")
-
-        self.buttons["new_ann"] = tk.Button(
-            master=self.container, text="New")
-        self.buttons["new_ann"].grid(row=0, column=0, sticky="ew")
-
-        self.buttons["load_ann"] = tk.Button(
-            master=self.container, text="Load")
-        self.buttons["load_ann"].grid(row=1, column=0, sticky="ew")
-
-        self.buttons["save_ann"] = tk.Button(
-            master=self.container, text="Save")
-        self.buttons["save_ann"].grid(row=2, column=0, sticky="ew")
-
-        self.buttons["export_ann"] = tk.Button(
-            master=self.container, text="Export")
-        self.buttons["export_ann"].grid(row=3, column=0, sticky="ew")
-
-    def config_window(self):
-        """Configure app's root node (tk.Tk()) i.e. self
-        """
-        self.rowconfigure(0,  weight=1)
-        self.columnconfigure(0, weight=1)
         self.grid(row=0, column=0, sticky="nsew")
 
     def activate_button(self, name):
@@ -378,8 +347,9 @@ class VideoFrame(tk.Frame):
             menu.delete(0, "end")
             for option in options:
                 menu.add_command(label=option,
-                                 command=lambda value=option[:self.max_chars_vid_list]:
+                                 command=lambda value=option:
                                  self.string_vars["select_video"].set(value))
+                #  command=lambda value=option[:self.max_chars_vid_list]:
 
     def get_selected_video(self):
         video_variable = self.string_vars["select_video"]
