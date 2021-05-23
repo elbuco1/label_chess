@@ -225,7 +225,46 @@ class ChessFenAnnotatorController(Controller):
         anns = db.query(models.Annotation).all()
         options = [
             os.path.split(ann.csv_path)[1] for ann in anns]
-        checks = views.export.export_dialog(self.view, options)
+        checked_anns = views.export.export_dialog(self.view, options)
+
+        export_dir = filedialog.askdirectory()
+
+        try:
+            # annotation file, video url, pgn url
+            rows = []
+            for ann in checked_anns:
+                csv_path = os.path.join(
+                    models.ANNOTATIONS_DATA_DIR,
+                    ann)
+
+                export_csv_path = os.path.join(
+                    export_dir,
+                    ann)
+
+                annotation = db.query(models.Annotation).filter(
+                    models.Annotation.csv_path == csv_path).one()
+
+                row = [ann, annotation.video_url,
+                       annotation.pgn_url]
+                rows.append(row)
+
+                shutil.copy(csv_path, export_csv_path)
+
+            df = pd.DataFrame(rows, columns=[
+                "annotation_file", "video_url", "pgn_url"])
+
+            df_path = os.path.join(
+                export_dir, "annotations.csv")
+
+            df.to_csv(df_path, index=True)
+
+        except Exception:
+            traceback.print_exc()
+            messagebox.showwarning("Export annotation",
+                                   "Couldn't export annotation.")
+        messagebox.showinfo("Export annotation",
+                            "Annotation successfully exported "
+                            f"to {export_dir}")
 
     def end_annotation(self):
         saved_frames = self.last_saved_frame[1:]
