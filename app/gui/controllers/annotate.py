@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, simpledialog
 from tkinter import messagebox
+import traceback
 
 from PIL import Image, ImageTk
 import os
@@ -11,6 +12,7 @@ import time
 from app import utils, chess2fen
 from app.gui.base import Controller
 from app.gui import views, controllers, models
+import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
@@ -66,6 +68,7 @@ class ChessFenAnnotatorController(Controller):
         self.setup_variables()
         self.save_color = "#2CE26E"
         self.unsave_color = "#F4241E"
+        self.orig_color = ""
         self.popup_dur = 1000
         self.flash_dur = 100
 
@@ -129,9 +132,18 @@ class ChessFenAnnotatorController(Controller):
 
         self.setup_keyboard_shortcuts()
 
-        # annotation binds
+        # footer binds
         self.view.buttons["start_button"].configure(
             command=self.start_annotation)
+
+        self.view.buttons["cancel_button"].configure(
+            command=self.reset_app)
+
+        self.view.buttons["end_button"].configure(
+            command=self.end_annotation)
+
+        self.view.buttons["export_button"].configure(
+            command=self.export_annotation)
 
     def setup_variables(self):
         self.frames = []
@@ -139,7 +151,8 @@ class ChessFenAnnotatorController(Controller):
         self.last_saved_frame = [-1]
         self.last_saved_fen = [-1]
         self.current_fen = -1
-        self.fen_images, self.fens = None, None
+        self.fens, self.frame_generator = None, None
+        self.video, self.pgn = None, None
 
     def setup_keyboard_shortcuts(self):
         """ Associate keys to buttons.
@@ -175,11 +188,10 @@ class ChessFenAnnotatorController(Controller):
         names = [e[0] for e in names]
         update_func(names)
 
-    def get_path_object_by_name(self, obj, name):
+    def get_object_by_name(self, obj, name):
         db = models.get_db()
-        path = db.query(obj.path).filter_by(name=name).all()
-        path = path[0][0]
-        return path
+        obj = db.query(obj).filter_by(name=name).all()
+        return obj[0]
 
     def start_annotation(self):
         # get selected video name
@@ -208,16 +220,68 @@ class ChessFenAnnotatorController(Controller):
 
         self.update_states(caller="start_annotation")
 
+    def export_annotation(self):
+        db = models.get_db()
+        anns = db.query(models.Annotation).all()
+        options = [
+            os.path.split(ann.csv_path)[1] for ann in anns]
+        checks = views.export.export_dialog(self.view, options)
+
+    def end_annotation(self):
+        saved_frames = self.last_saved_frame[1:]
+        saved_fens = self.last_saved_fen[1:]
+        rows = []
+        for fen_id, frame_id in zip(saved_fens, saved_frames):
+            fen = self.fens[fen_id][0]
+            frame = self.frames[frame_id][0]
+            row = [frame, fen]
+            rows.append(row)
+        df = pd.DataFrame(rows, columns=["frame_id", "fen"])
+
+        # ask for annotation name(must be unique)
+        db = models.get_db()
+
+        anns = db.query(models.Annotation).all()
+        csv_files = [e.csv_path for e in anns]
+
+        while True:
+            csv_name = simpledialog.askstring(
+                "Name", "Enter annotation name:", parent=self.view)
+            csv_path = os.path.join(models.ANNOTATIONS_DATA_DIR,
+                                    f"{csv_name}.csv")
+            if csv_path not in csv_files:
+                break
+
+        try:
+            df.to_csv(csv_path, index=False)
+            ann = models.Annotation(
+                video_url=self.video.url,
+                pgn_url=self.pgn.url,
+                csv_path=csv_path
+            )
+            db.add(ann)
+            db.commit()
+            self.update_states(caller="end_annotation")
+
+        except Exception:
+            traceback.print_exc()
+            messagebox.showwarning("Annotation",
+                                   "Couldn't save annotation.")
+
+        messagebox.showinfo("Annotation",
+                            "Successfully saved annotation.")
+        self.reset_app()
+
     def load_video(self, video_name, fps_ratio):
         """Load an mp4 video from file and display the first frame.
         Set a default value for the save directory.
         When loading video, pgn is reset.
         """
-        video_path = self.get_path_object_by_name(
+        self.video = self.get_object_by_name(
             models.Video, video_name)
 
         self.frame_generator = utils.frames_from_video_generator(
-            video_path, fps_ratio)
+            self.video.path, fps_ratio)
 
         self.get_next_frame()
         # default save directory
@@ -226,12 +290,12 @@ class ChessFenAnnotatorController(Controller):
 
     def load_pgn(self, pgn_name):
         """Load PGN file and display first fen"""
-        pgn_path = self.get_path_object_by_name(
+        self.pgn = self.get_object_by_name(
             models.PGN, pgn_name)
 
         # load fens and chessboard representations
-        self.fen_images, self.fens = chess2fen.get_game_board_images(
-            pgn_path,
+        self.fens = chess2fen.get_game_board_images(
+            self.pgn.path,
             self.pieces_path
         )
         # display first fen's image
@@ -239,66 +303,12 @@ class ChessFenAnnotatorController(Controller):
 
         self.update_states(caller="load_pgn")
 
-    def update_states(self, caller):
-        """Activation/Deactivation of components. To change state
-        of components, methods should call this method. This allows
-        to centralize the state/transition information in one point.
-
-        Args:
-            caller (str): str to identify which method called
-                update_states
-        """
-        if caller == "start_annotation":
-            self.view.disable_button("start_button")
-
-        elif caller == "load_video":
-            self.view.frames["video"].activate_button("next_frame")
-            self.view.frames["video"].disable_button("select_video")
-            self.view.frames["video"].disable_button("fps_ratio")
-
-        elif caller == "load_pgn":
-            self.view.frames["pgn"].activate_button("skip_fen")
-            self.view.frames["video"].activate_button("save_frame")
-            self.view.frames["pgn"].disable_button("select_pgn")
-
-        elif caller == "save_frame":
-            self.view.frames["video"].disable_button("previous_frame")
-            self.view.frames["video"].activate_button("unsave_frame")
-
-            label = self.view.frames["video"].labels["saved"]
-            self.label_popup(
-                label=label, color=self.save_color, text="frame saved",
-                time=self.popup_dur)
-        elif caller == "next_frame_empty":
-            self.view.frames["video"].disable_button("next_frame")
-        elif caller == "next_frame":
-            if self.current_frame > 0:
-                self.view.frames["video"].activate_button("previous_frame")
-        elif caller == "previous_frame":
-            self.view.frames["video"].activate_button("next_frame")
-            if self.current_frame == self.last_saved_frame[-1] + 1:
-                self.view.frames["video"].disable_button("previous_frame")
-        elif caller == "unsave_frame":
-            # reenable previous frame button
-            self.view.frames["video"].activate_button(
-                "previous_frame")
-            # if no more saved frame in history, disable
-            # unsave button
-            if len(self.last_saved_frame) < 2:
-                self.view.frames["video"].disable_button(
-                    "unsave_frame")
-
-            label = self.view.frames["video"].labels["saved"]
-            self.label_popup(
-                label=label, color=self.unsave_color, text="frame unsaved",
-                time=self.popup_dur)
-
     def get_next_fen(self, event=None):
         """Get the next fen image in the list
         and display it in the gui
         """
         self.current_fen += 1
-        next_fen = self.fen_images[self.current_fen]
+        next_fen = self.fens[self.current_fen][-1]
         self.view.frames["pgn"].set_image(next_fen)
 
     def get_next_frame(self, event=None):
@@ -312,15 +322,12 @@ class ChessFenAnnotatorController(Controller):
 
             if self.current_frame > -1 and \
                     self.current_frame < len(self.frames)-1:
-                next_frame = self.frames[self.current_frame]
+                next_frame = self.frames[self.current_frame][-1]
             else:
-                next_img = next(self.frame_generator)
+                next_img, frame_number = next(self.frame_generator)
                 next_frame = Image.fromarray(next_img)
-                self.frames.append(next_frame)
-
-            # frame_height = self.view.frames["video"].winfo_height()
+                self.frames.append([frame_number, next_frame])
             self.view.frames["video"].set_image(next_frame)
-            # self.view.frames["video"].set_image(next_frame, frame_height)
 
         except StopIteration:
             self.current_frame -= 1
@@ -376,11 +383,13 @@ class ChessFenAnnotatorController(Controller):
             text (str): text to display in label
             time (int): waiting time before reset in ms
         """
-        orig_color = label.cget("background")
+        if self.orig_color == "":
+            self.orig_color = label.cget("background")
+
         label.config(
             bg=color, text=text)
 
-        label.after(time, lambda: label.config(bg=orig_color, text=""))
+        label.after(time, lambda: label.config(bg=self.orig_color, text=""))
 
     def flash(self, button, time):
         orig_state = button["state"]
@@ -395,3 +404,64 @@ class ChessFenAnnotatorController(Controller):
         """
         self.setup_variables()
         self.bind_view(self.view)
+
+    def update_states(self, caller):
+        """Activation/Deactivation of components. To change state
+        of components, methods should call this method. This allows
+        to centralize the state/transition information in one point.
+
+        Args:
+            caller (str): str to identify which method called
+                update_states
+        """
+        if caller == "start_annotation":
+            self.view.disable_button("start_button")
+            self.view.activate_button("cancel_button")
+            self.view.activate_button("end_button")
+
+        elif caller == "end_annotation":
+            self.view.activate_button("start_button")
+            self.view.disable_button("cancel_button")
+            self.view.disable_button("end_button")
+
+        elif caller == "load_video":
+            self.view.frames["video"].activate_button("next_frame")
+            self.view.frames["video"].disable_button("select_video")
+            self.view.frames["video"].disable_button("fps_ratio")
+
+        elif caller == "load_pgn":
+            self.view.frames["pgn"].activate_button("skip_fen")
+            self.view.frames["video"].activate_button("save_frame")
+            self.view.frames["pgn"].disable_button("select_pgn")
+
+        elif caller == "save_frame":
+            self.view.frames["video"].disable_button("previous_frame")
+            self.view.frames["video"].activate_button("unsave_frame")
+
+            label = self.view.frames["video"].labels["saved"]
+            self.label_popup(
+                label=label, color=self.save_color, text="frame saved",
+                time=self.popup_dur)
+        elif caller == "next_frame_empty":
+            self.view.frames["video"].disable_button("next_frame")
+        elif caller == "next_frame":
+            if self.current_frame > 0:
+                self.view.frames["video"].activate_button("previous_frame")
+        elif caller == "previous_frame":
+            self.view.frames["video"].activate_button("next_frame")
+            if self.current_frame == self.last_saved_frame[-1] + 1:
+                self.view.frames["video"].disable_button("previous_frame")
+        elif caller == "unsave_frame":
+            # reenable previous frame button
+            self.view.frames["video"].activate_button(
+                "previous_frame")
+            # if no more saved frame in history, disable
+            # unsave button
+            if len(self.last_saved_frame) < 2:
+                self.view.frames["video"].disable_button(
+                    "unsave_frame")
+
+            label = self.view.frames["video"].labels["saved"]
+            self.label_popup(
+                label=label, color=self.unsave_color, text="frame unsaved",
+                time=self.popup_dur)
