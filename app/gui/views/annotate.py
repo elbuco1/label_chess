@@ -6,10 +6,11 @@ from app import utils, chess2fen
 
 
 class ChessFenAnnotatorView(View):
-    def __init__(self, master=None, img_prop=0.85):
+    def __init__(self, master=None, img_prop=0.8, height=0):
         super().__init__(master)
         self.master = master
         self.img_prop = img_prop
+        self.height = height
         self.config_window()
 
         self.frames = {}
@@ -34,12 +35,14 @@ class ChessFenAnnotatorView(View):
         self.imgs.grid(row=0, column=0, sticky="nsew")
 
         self.frames["pgn"] = PGNFrame(self.imgs,
-                                      img_prop=self.img_prop)
+                                      img_prop=self.img_prop,
+                                      height=self.height)
         self.frames["pgn"].create_view()
         self.frames["pgn"].grid(row=0, column=0, sticky="nsew")
 
         self.frames["video"] = VideoFrame(self.imgs,
-                                          img_prop=self.img_prop)
+                                          img_prop=self.img_prop,
+                                          height=self.height)
         self.frames["video"].create_view()
         self.frames["video"].grid(row=0, column=1, sticky="nsew")
 
@@ -60,6 +63,12 @@ class ChessFenAnnotatorView(View):
 
         self.rowconfigure(0, weight=1)
         self.grid(row=0, column=0, sticky="nsew")
+
+    def activate_button(self, name):
+        self.buttons[name]["state"] = "normal"
+
+    def disable_button(self, name):
+        self.buttons[name]["state"] = "disabled"
 
 
 class AnnotationsFrame(tk.Frame):
@@ -110,10 +119,11 @@ class AnnotationsFrame(tk.Frame):
 
 
 class PGNFrame(tk.Frame):
-    def __init__(self, master=None, img_prop=0.9, max_chars_pgn_list=40):
+    def __init__(self, master=None, img_prop=0.9, height=0, max_chars_pgn_list=40):
         super().__init__(master)
         self.master = master
         self.img_prop = img_prop
+        self.height = height
         self.max_chars_pgn_list = max_chars_pgn_list
 
         self.default_select_option = "Select pgn..."
@@ -180,24 +190,16 @@ class PGNFrame(tk.Frame):
         self.labels["fen"].image = image
 
     def set_image(self, image):
-        """Take a PIL image save it as an attribute
-        of the view and display it in a label.
+        """Take a PIL image and save it
+        as an attribute of the view.
+        Display the image in the video label.
+
         Args:
             image (PIL.Image)
         """
         self.image = image
-        self.display_image(image)
-
-    def resize_image(self, height):
-        """Resize pgn image based on new height.
-        Provides the controller with a method that
-        resizes the image.
-
-        Args:
-            height (int): new height for image
-        """
-        image_height = int(self.img_prop*height)
-        image = utils.resize_image(self.image, image_height)
+        height = int(self.img_prop * self.height)
+        image = utils.resize_image(image, height)
         self.display_image(image)
 
     def update_pgn_list(self, options):
@@ -230,11 +232,12 @@ class PGNFrame(tk.Frame):
 
 
 class VideoFrame(tk.Frame):
-    def __init__(self, master=None, img_prop=0.9,
+    def __init__(self, master=None, height=0, img_prop=0.9,
                  max_chars_vid_list=80):
         super().__init__(master)
         self.master = master
         self.img_prop = img_prop
+        self.height = height
         self.max_chars_vid_list = max_chars_vid_list
 
         self.default_video_option = "Select video..."
@@ -280,7 +283,7 @@ class VideoFrame(tk.Frame):
         self.buttons["select_video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
-        fps_options = [str(i) for i in range(1, 30)]
+        fps_options = [1, 5, 10, 15, 20, 25, 30]
 
         self.string_vars["fps_ratio"] = tk.StringVar(self.selection_frm)
         self.string_vars["fps_ratio"].set(self.default_fps_option)
@@ -358,7 +361,10 @@ class VideoFrame(tk.Frame):
         Args:
             image (PIL.Image)
         """
+        # self.master.master.update_idletasks()
         self.image = image
+        height = int(self.img_prop * self.height)
+        image = utils.resize_image(image, height)
         self.display_image(image)
 
     def update_video_list(self, options):
@@ -390,18 +396,6 @@ class VideoFrame(tk.Frame):
         if fps == self.default_fps_option:
             fps = -1
         return int(fps)
-
-    def resize_image(self, height):
-        """Resize video image based on new height.
-        Provides the controller with a method that
-        resizes the image.
-
-        Args:
-            height (int): new height for image
-        """
-        image_height = int(self.img_prop*height)
-        image = utils.resize_image(self.image, image_height)
-        self.display_image(image)
 
     def activate_button(self, name):
         self.buttons[name]["state"] = "normal"

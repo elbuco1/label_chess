@@ -7,7 +7,7 @@ import os
 import pathlib
 import json
 import shutil
-
+import time
 from app import utils, chess2fen
 from app.gui.base import Controller
 from app.gui import views, controllers, models
@@ -54,7 +54,7 @@ def open_window(root, new_view, new_controller,
     # redirect keyboard to new window
     window.grab_set()
     # create and bind view and controller
-    new_view = new_view(master=window)
+    new_view = new_view(master=window, height=height)
     new_controller = new_controller()
     new_controller.bind_view(view=new_view)
 
@@ -157,18 +157,6 @@ class ChessFenAnnotatorController(Controller):
                               lambda event: video_btns["unsave_frame"].invoke())
         self.view.master.bind('<space>',
                               lambda event: pgn_btns["skip_fen"].invoke())
-
-        # resize video image automatically when window is resized
-        # TODO way too slow
-        video_frame = self.view.frames["video"]
-        video_frame.bind('<Configure>',
-                         lambda event: self.resize_image(video_frame, event))
-
-        # resize pgn image automatically when window is resized
-        pgn_frame = self.view.frames["pgn"]
-        pgn_frame.bind('<Configure>',
-                       lambda event: self.resize_image(pgn_frame, event))
-
         # flash buttons
         self.view.master.bind('<Left>', lambda event: self.flash(
             video_btns["previous_frame"], self.flash_dur), add="+")
@@ -186,18 +174,6 @@ class ChessFenAnnotatorController(Controller):
         names = db.query(query).all()
         names = [e[0] for e in names]
         update_func(names)
-
-    def resize_image(self, frame, event):
-        """Assuming a view that posess a method
-        resize_image that resizes its images based
-        on height.
-
-        Args:
-            frame (base.View): View with method
-                resize_image
-        """
-        new_height = event.height
-        frame.resize_image(new_height)
 
     def get_path_object_by_name(self, obj, name):
         db = models.get_db()
@@ -230,9 +206,7 @@ class ChessFenAnnotatorController(Controller):
         self.load_video(video_name, fps_ratio)
         self.load_pgn(pgn_name)
 
-        # disable selection buttons
-        # display pgn
-        # display frames
+        self.update_states(caller="start_annotation")
 
     def load_video(self, video_name, fps_ratio):
         """Load an mp4 video from file and display the first frame.
@@ -274,7 +248,10 @@ class ChessFenAnnotatorController(Controller):
             caller (str): str to identify which method called
                 update_states
         """
-        if caller == "load_video":
+        if caller == "start_annotation":
+            self.view.disable_button("start_button")
+
+        elif caller == "load_video":
             self.view.frames["video"].activate_button("next_frame")
             self.view.frames["video"].disable_button("select_video")
             self.view.frames["video"].disable_button("fps_ratio")
@@ -340,7 +317,11 @@ class ChessFenAnnotatorController(Controller):
                 next_img = next(self.frame_generator)
                 next_frame = Image.fromarray(next_img)
                 self.frames.append(next_frame)
+
+            # frame_height = self.view.frames["video"].winfo_height()
             self.view.frames["video"].set_image(next_frame)
+            # self.view.frames["video"].set_image(next_frame, frame_height)
+
         except StopIteration:
             self.current_frame -= 1
             self.update_states(caller="next_frame_empty")
