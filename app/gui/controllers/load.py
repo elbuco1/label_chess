@@ -38,16 +38,18 @@ class VideoLoaderController(Controller):
         if url == "":
             url = self.video_path
 
-        if self.video_exists_in_db(url):
+        video_name = os.path.split(self.video_path)[-1]
+        video_name = video_name.replace(" ", "_").lower()
+
+        if self.video_exists_in_db(url, video_name):
             messagebox.showwarning("Already exists",
-                                   f"Video from url: '{url}'"
+                                   f"Video "
                                    "already exists in database")
             return
-        video_name = os.path.split(self.video_path)[-1]
+
         db_path = os.path.join(models.VIDEO_DATA_DIR,
                                video_name)
 
-        video_name = video_name.replace(" ", "_").lower()
         new_video = models.Video(
             url=url,
             original_path=self.video_path,
@@ -65,17 +67,22 @@ class VideoLoaderController(Controller):
         label = self.view.labels["select_video"]
         label.configure(text="")
 
-    def video_exists_in_db(self, url):
-        """Check if video url is already
+    def video_exists_in_db(self, url, name):
+        """Check if video url or name is already
         in database.
 
         Args:
             url (str)
+            name (str)
         """
         db = models.get_db()
         urls = db.query(models.Video.url).all()
+        names = db.query(models.Video.name).all()
+
         urls = {e[0] for e in urls}
-        return url in urls
+        names = {e[0] for e in names}
+
+        return url in urls or name in names
 
     def persist_video(self, video, original_path, db_path):
         """Add video object to db.
@@ -121,17 +128,18 @@ class PGNLoaderController(Controller):
         if url == "":
             url = self.pgn_path
 
-        if self.pgn_exists_in_db(url):
+        pgn_name = os.path.split(self.pgn_path)[-1]
+        pgn_name = pgn_name.replace(" ", "_").lower()
+
+        if self.pgn_exists_in_db(url, pgn_name):
             messagebox.showwarning("Already exists",
-                                   f"PGN from url: '{url}'"
+                                   f"PGN "
                                    "already exists in database")
             return
 
-        pgn_name = os.path.split(self.pgn_path)[-1]
         db_path = os.path.join(models.PGN_DATA_DIR,
                                pgn_name)
 
-        pgn_name = pgn_name.replace(" ", "_").lower()
         new_pgn = models.PGN(
             url=url,
             original_path=self.pgn_path,
@@ -149,17 +157,21 @@ class PGNLoaderController(Controller):
         label = self.view.labels["select_pgn"]
         label.configure(text="")
 
-    def pgn_exists_in_db(self, url):
+    def pgn_exists_in_db(self, url, name):
         """Check if pgn url is already
         in database.
 
         Args:
             url (str)
+            name (str)
         """
         db = models.get_db()
         urls = db.query(models.PGN.url).all()
+        names = db.query(models.PGN.name).all()
+
         urls = {e[0] for e in urls}
-        return url in urls
+        names = {e[0] for e in names}
+        return url in urls or name in names
 
     def persist_pgn(self, pgn, original_path, db_path):
         """Add pgn object to db.

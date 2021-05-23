@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 
 from PIL import Image, ImageTk
 import os
@@ -85,7 +86,6 @@ class ChessFenAnnotatorController(Controller):
                                                  lambda event: self.populate_menu_buttons(
                                                      query=models.Video.name,
                                                      update_func=video_frame.update_video_list))
-
         video_frame.buttons["next_frame"].configure(
             command=self.get_next_frame)
         video_frame.buttons["previous_frame"].configure(
@@ -129,6 +129,10 @@ class ChessFenAnnotatorController(Controller):
 
         self.setup_keyboard_shortcuts()
 
+        # annotation binds
+        self.view.buttons["start_button"].configure(
+            command=self.start_annotation)
+
     def setup_variables(self):
         self.frames = []
         self.current_frame = -1
@@ -155,6 +159,7 @@ class ChessFenAnnotatorController(Controller):
                               lambda event: pgn_btns["skip_fen"].invoke())
 
         # resize video image automatically when window is resized
+        # TODO way too slow
         video_frame = self.view.frames["video"]
         video_frame.bind('<Configure>',
                          lambda event: self.resize_image(video_frame, event))
@@ -194,6 +199,72 @@ class ChessFenAnnotatorController(Controller):
         new_height = event.height
         frame.resize_image(new_height)
 
+    def get_path_object_by_name(self, obj, name):
+        db = models.get_db()
+        path = db.query(obj.path).filter_by(name=name).all()
+        path = path[0][0]
+        return path
+
+    def start_annotation(self):
+        # get selected video name
+        video_frame = self.view.frames["video"]
+        pgn_frame = self.view.frames["pgn"]
+
+        video_name = video_frame.get_selected_video()
+        if video_name == "":
+            messagebox.showwarning("No video selected",
+                                   "Please select a video.")
+            return
+
+        fps_ratio = video_frame.get_selected_fps_ratio()
+        if fps_ratio == -1:
+            messagebox.showwarning("No fps ratio selected",
+                                   "Please select a fps ratio.")
+            return
+        pgn_name = pgn_frame.get_selected_pgn()
+        if pgn_name == "":
+            messagebox.showwarning("No pgn selected",
+                                   "Please select a pgn file.")
+            return
+
+        self.load_video(video_name, fps_ratio)
+        self.load_pgn(pgn_name)
+
+        # disable selection buttons
+        # display pgn
+        # display frames
+
+    def load_video(self, video_name, fps_ratio):
+        """Load an mp4 video from file and display the first frame.
+        Set a default value for the save directory.
+        When loading video, pgn is reset.
+        """
+        video_path = self.get_path_object_by_name(
+            models.Video, video_name)
+
+        self.frame_generator = utils.frames_from_video_generator(
+            video_path, fps_ratio)
+
+        self.get_next_frame()
+        # default save directory
+        self.view.master.title(f"Chess video FEN annotator - {video_name}")
+        self.update_states(caller="load_video")
+
+    def load_pgn(self, pgn_name):
+        """Load PGN file and display first fen"""
+        pgn_path = self.get_path_object_by_name(
+            models.PGN, pgn_name)
+
+        # load fens and chessboard representations
+        self.fen_images, self.fens = chess2fen.get_game_board_images(
+            pgn_path,
+            self.pieces_path
+        )
+        # display first fen's image
+        self.get_next_fen()
+
+        self.update_states(caller="load_pgn")
+
     def update_states(self, caller):
         """Activation/Deactivation of components. To change state
         of components, methods should call this method. This allows
@@ -203,32 +274,24 @@ class ChessFenAnnotatorController(Controller):
             caller (str): str to identify which method called
                 update_states
         """
-        if caller == "select_fps":
-            # self.view.frames["side_menu"].activate_button("video")
-            pass
-        elif caller == "select_save_dir":
-            # self.view.frames["side_menu"].activate_button("fps")
-            pass
-        elif caller == "load_video":
+        if caller == "load_video":
             self.view.frames["video"].activate_button("next_frame")
-            # self.view.frames["side_menu"].activate_button("pgn")
-            # self.view.frames["side_menu"].disable_button("fps")
+            self.view.frames["video"].disable_button("select_video")
+            self.view.frames["video"].disable_button("fps_ratio")
 
         elif caller == "load_pgn":
             self.view.frames["pgn"].activate_button("skip_fen")
             self.view.frames["video"].activate_button("save_frame")
-            # self.view.frames["side_menu"].disable_button("video")
+            self.view.frames["pgn"].disable_button("select_pgn")
+
         elif caller == "save_frame":
             self.view.frames["video"].disable_button("previous_frame")
             self.view.frames["video"].activate_button("unsave_frame")
-            # self.view.frames["side_menu"].disable_button("save_dir")
-            # self.view.frames["side_menu"].disable_button("pgn")
 
             label = self.view.frames["video"].labels["saved"]
             self.label_popup(
                 label=label, color=self.save_color, text="frame saved",
                 time=self.popup_dur)
-
         elif caller == "next_frame_empty":
             self.view.frames["video"].disable_button("next_frame")
         elif caller == "next_frame":
@@ -252,68 +315,6 @@ class ChessFenAnnotatorController(Controller):
             self.label_popup(
                 label=label, color=self.unsave_color, text="frame unsaved",
                 time=self.popup_dur)
-
-    # def select_fps(self, *args):
-    #     """Select the subsampling rate for the video
-    #     before loading the video.
-    #     Only once this has been selected can the video
-    #     be loaded.
-    #     """
-    #     side_menu = self.view.frames["side_menu"]
-    #     fps_variable = side_menu.string_vars["fps"]
-    #     self.fps_ratio = int(fps_variable.get())
-    #     self.update_states(caller="select_fps")
-
-    def select_save_dir(self):
-        """Open a dialog to select a directory
-        where to save frames.
-        """
-        save_dir = filedialog.askdirectory(
-            mustexist=False
-        )
-        if not save_dir:
-            return
-        self.save_dir = save_dir
-        self.update_states(caller="select_save_dir")
-
-    def load_video(self):
-        """Load an mp4 video from file and display the first frame.
-        Set a default value for the save directory.
-        When loading video, pgn is reset.
-        """
-        self.video_path = filedialog.askopenfilename(
-            filetypes=[("MP4 Files", "*.mp4"), ("All Files", "*.*")]
-        )
-        if not self.video_path:
-            return
-
-        self.frame_generator = utils.frames_from_video_generator(
-            self.video_path, self.fps_ratio)
-
-        self.get_next_frame()
-
-        # default save directory
-        _, video_name = os.path.split(self.video_path)
-        self.view.master.title(f"Chess video FEN annotator - {video_name}")
-        self.update_states(caller="load_video")
-
-    def load_pgn(self):
-        """Load PGN file and display first fen"""
-        self.pgn_path = filedialog.askopenfilename(
-            filetypes=[("All Files", "*.*")]
-        )
-        if not self.pgn_path:
-            return
-
-        # load fens and chessboard representations
-        self.fen_images, self.fens = chess2fen.get_game_board_images(
-            self.pgn_path,
-            self.pieces_path
-        )
-        # display first fen's image
-        self.get_next_fen()
-
-        self.update_states(caller="load_pgn")
 
     def get_next_fen(self, event=None):
         """Get the next fen image in the list
@@ -355,27 +356,11 @@ class ChessFenAnnotatorController(Controller):
             self.current_frame -= 2
             self.get_next_frame()
 
-        self.update_states(caller="previous_frame")
+        self.update_states(caller="previous_frame")  # TODO decorator?
 
     def save_frame(self, event=None):
-        """Save currently displayed frame to
-        self.save_dir and save matching fen
-        to json file with the same name as the frame.
         """
-        if not os.path.exists(self.save_dir):
-            os.makedirs(self.save_dir)
-
-        frame = self.frames[self.current_frame]
-        fen = self.fens[self.current_fen]
-
-        frame_path, fen_path = self.get_save_paths(
-            self.current_frame
-        )
-
-        fen = {"fen": fen}
-        json.dump(fen, open(fen_path, "w"))
-
-        frame.save(frame_path)
+        """
         self.last_saved_frame.append(self.current_frame)
         self.last_saved_fen.append(self.current_fen)
 
@@ -384,29 +369,6 @@ class ChessFenAnnotatorController(Controller):
 
         self.update_states(caller="save_frame")
 
-    def get_save_paths(self, frame):
-        """Get the paths to save frame to jpeg
-        and fen to json. Files are named after
-        a frame id
-
-        Args:
-            frame (int): frame id
-
-        Returns:
-            str: jpeg fiel path
-            str: json fiel path
-        """
-        frame_path = os.path.join(
-            self.save_dir,
-            f"frame{frame}.jpeg"
-        )
-
-        fen_path = os.path.join(
-            self.save_dir,
-            f"frame{frame}.json"
-        )
-        return frame_path, fen_path
-
     def unsave_frame(self):
         """Revert the last saved frame
         """
@@ -414,15 +376,8 @@ class ChessFenAnnotatorController(Controller):
         if len(self.last_saved_frame) > 1:
             # get last saved frame and fen ids
             # and remove them from the save history
-            last_save_frame = self.last_saved_frame.pop()
+            self.last_saved_frame.pop()
             last_save_fen = self.last_saved_fen.pop()
-            # get paths of last saved frame and fen
-            # then delete them
-            frame_path, fen_path = self.get_save_paths(
-                last_save_frame
-            )
-            os.remove(frame_path)
-            os.remove(fen_path)
             # plot the last save fen
             self.current_fen = last_save_fen - 1
             self.get_next_fen()
@@ -448,8 +403,9 @@ class ChessFenAnnotatorController(Controller):
 
     def flash(self, button, time):
         orig_state = button["state"]
-        button.config(state="active")
-        button.after(time, lambda: button.config(state=orig_state))
+        if orig_state == "normal":
+            button.config(state="active")
+            button.after(time, lambda: button.config(state=orig_state))
 
     def reset_app(self, event=None):
         """Reset video and pgn.

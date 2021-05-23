@@ -116,6 +116,8 @@ class PGNFrame(tk.Frame):
         self.img_prop = img_prop
         self.max_chars_pgn_list = max_chars_pgn_list
 
+        self.default_select_option = "Select pgn..."
+
         self.buttons = {}
         self.labels = {}
         self.string_vars = {}
@@ -141,10 +143,10 @@ class PGNFrame(tk.Frame):
         self.buttons["add_pgn"].grid(row=0, column=0, sticky="nsew")
         # select pgn
         self.string_vars["select_pgn"] = tk.StringVar(self.select_frm)
-        self.string_vars["select_pgn"].set("Select pgn...")
+        self.string_vars["select_pgn"].set(self.default_select_option)
         self.buttons["select_pgn"] = tk.OptionMenu(master=self.select_frm,
                                                    variable=self.string_vars["select_pgn"],
-                                                   value='Select pgn...')
+                                                   value=self.default_select_option)
         # self.disable_button("select_pgn")
         self.buttons["select_pgn"].grid(row=0, column=1, sticky="nsew")
 
@@ -212,6 +214,14 @@ class PGNFrame(tk.Frame):
                                  command=lambda value=option[:self.max_chars_pgn_list]:
                                  self.string_vars["select_pgn"].set(value))
 
+    def get_selected_pgn(self):
+        pgn_variable = self.string_vars["select_pgn"]
+        pgn_name = pgn_variable.get()
+
+        if pgn_name == self.default_select_option:
+            pgn_name = ""
+        return pgn_name
+
     def activate_button(self, name):
         self.buttons[name]["state"] = "normal"
 
@@ -226,6 +236,9 @@ class VideoFrame(tk.Frame):
         self.master = master
         self.img_prop = img_prop
         self.max_chars_vid_list = max_chars_vid_list
+
+        self.default_video_option = "Select video..."
+        self.default_fps_option = "FPS ratio..."
 
         self.buttons = {}
         self.labels = {}
@@ -258,22 +271,24 @@ class VideoFrame(tk.Frame):
 
         # select video
         self.string_vars["select_video"] = tk.StringVar(self.selection_frm)
-        self.string_vars["select_video"].set("Select video...")
+        self.string_vars["select_video"].set(self.default_video_option)
         self.buttons["select_video"] = tk.OptionMenu(master=self.selection_frm,
                                                      variable=self.string_vars["select_video"],
-                                                     value='Select video...')
+                                                     value=self.default_video_option)
         # https://stackoverflow.com/questions/7393430/how-can-i-dynamic-populate-an-option-widget-in-tkinter-depending-on-a-choice-fro/7403530#7403530
         # self.disable_button("video")
         self.buttons["select_video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
-        self.string_vars["fps"] = tk.StringVar(self.selection_frm)
-        self.string_vars["fps"].set("FPS ratio...")
-        self.buttons["fps"] = tk.OptionMenu(master=self.selection_frm,
-                                            variable=self.string_vars["fps"],
-                                            value='FPS ratio...')
+        fps_options = [str(i) for i in range(1, 30)]
+
+        self.string_vars["fps_ratio"] = tk.StringVar(self.selection_frm)
+        self.string_vars["fps_ratio"].set(self.default_fps_option)
+        self.buttons["fps_ratio"] = tk.OptionMenu(self.selection_frm,
+                                                  self.string_vars["fps_ratio"],
+                                                  *fps_options)
         # self.disable_button("fps")
-        self.buttons["fps"].grid(row=0, column=2, sticky="nsew")
+        self.buttons["fps_ratio"].grid(row=0, column=2, sticky="nsew")
         # video image
         self.labels["frame"] = tk.Label(
             master=self.container)
@@ -359,6 +374,22 @@ class VideoFrame(tk.Frame):
                 menu.add_command(label=option,
                                  command=lambda value=option[:self.max_chars_vid_list]:
                                  self.string_vars["select_video"].set(value))
+
+    def get_selected_video(self):
+        video_variable = self.string_vars["select_video"]
+        video_name = video_variable.get()
+
+        if video_name == self.default_video_option:
+            video_name = ""
+        return video_name
+
+    def get_selected_fps_ratio(self):
+        fps_variable = self.string_vars["fps_ratio"]
+        fps = fps_variable.get()
+
+        if fps == self.default_fps_option:
+            fps = -1
+        return int(fps)
 
     def resize_image(self, height):
         """Resize video image based on new height.

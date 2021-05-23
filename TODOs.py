@@ -12,3 +12,10 @@
 # TODO select subset of image
 
 # TODO refactor loader -> only one object
+
+# TODO start button becomes end button when clicked saves annotation
+
+
+# TODO start stop cancel export + get rid of side menu
+
+# TODO query functions in the model
