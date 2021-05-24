@@ -1,20 +1,21 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from app.gui.base import View
+from app.gui.base import View, ButtonsMixin
 from app import utils, chess2fen
 
 
-class ChessFenAnnotatorView(View):
+class ChessFenAnnotatorView(View, ButtonsMixin):
     def __init__(self, master=None, img_prop=0.8, height=0):
-        super().__init__(master)
+        View.__init__(self, master)
+        ButtonsMixin.__init__(self)
+
         self.master = master
         self.img_prop = img_prop
         self.height = height
         self.config_window()
 
         self.frames = {}
-        self.buttons = {}
         self.menus = {}
 
     def create_view(self):
@@ -80,16 +81,12 @@ class ChessFenAnnotatorView(View):
         self.rowconfigure(0, weight=1)
         self.grid(row=0, column=0, sticky="nsew")
 
-    def activate_button(self, name):
-        self.buttons[name]["state"] = "normal"
 
-    def disable_button(self, name):
-        self.buttons[name]["state"] = "disabled"
-
-
-class PGNFrame(tk.Frame):
+class PGNFrame(tk.Frame, ButtonsMixin):
     def __init__(self, master=None, img_prop=0.9, height=0, max_chars_pgn_list=40):
-        super().__init__(master)
+        tk.Frame.__init__(self, master)
+        ButtonsMixin.__init__(self)
+
         self.master = master
         self.img_prop = img_prop
         self.height = height
@@ -97,7 +94,6 @@ class PGNFrame(tk.Frame):
 
         self.default_select_option = "Select pgn..."
 
-        self.buttons = {}
         self.labels = {}
         self.string_vars = {}
 
@@ -193,17 +189,14 @@ class PGNFrame(tk.Frame):
             pgn_name = ""
         return pgn_name
 
-    def activate_button(self, name):
-        self.buttons[name]["state"] = "normal"
 
-    def disable_button(self, name):
-        self.buttons[name]["state"] = "disabled"
-
-
-class VideoFrame(tk.Frame):
+class VideoFrame(tk.Frame, ButtonsMixin):
     def __init__(self, master=None, height=0, img_prop=0.9,
                  max_chars_vid_list=80):
-        super().__init__(master)
+
+        tk.Frame.__init__(self, master)
+        ButtonsMixin.__init__(self)
+
         self.master = master
         self.img_prop = img_prop
         self.height = height
@@ -212,7 +205,6 @@ class VideoFrame(tk.Frame):
         self.default_video_option = "Select video..."
         self.default_fps_option = "FPS ratio..."
 
-        self.buttons = {}
         self.labels = {}
         self.string_vars = {}
         self.config_window()
@@ -330,7 +322,6 @@ class VideoFrame(tk.Frame):
         Args:
             image (PIL.Image)
         """
-        # self.master.master.update_idletasks()
         self.image = image
         height = int(self.img_prop * self.height)
         image = utils.resize_image(image, height)
@@ -349,7 +340,6 @@ class VideoFrame(tk.Frame):
                 menu.add_command(label=option,
                                  command=lambda value=option:
                                  self.string_vars["select_video"].set(value))
-                #  command=lambda value=option[:self.max_chars_vid_list]:
 
     def get_selected_video(self):
         video_variable = self.string_vars["select_video"]
@@ -366,9 +356,3 @@ class VideoFrame(tk.Frame):
         if fps == self.default_fps_option:
             fps = -1
         return int(fps)
-
-    def activate_button(self, name):
-        self.buttons[name]["state"] = "normal"
-
-    def disable_button(self, name):
-        self.buttons[name]["state"] = "disabled"
