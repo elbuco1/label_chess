@@ -2,12 +2,35 @@ import tkinter as tk
 from app.gui.base import View
 
 
-class VideoLoaderView(View):
-    def __init__(self, master=None, height=0):
+class LoaderView(View):
+    def __init__(self, master=None, add_name="", height=0):
+        """Subclass tkinter.Frame. Displays vertically:
+        * a button labeled "select_<add_name>"
+        * a label
+        * an entry labeled "URL (optional)
+        * a button labeled "Add"
+
+        It is intended to select a file on disk (video, txt),
+        join an optional attribute and save it to database.
+
+        This class implements only the front end, no logic should
+        be implemented here.
+
+        Args:
+            master (tk.Frame/tk.Tk, tk.TopLevel, optional): the widget's parent.
+                Defaults to None.
+            add_name (str, optional): string to customize the text of the first button.
+                Button is named "select_<add_name>". Defaults to "".
+            height (int, optional): The height of the window. For compatibility reasons,
+                not used here. Defaults to 0.
+        """
         super().__init__(master)
         self.master = master
         self.height = height
+        self.add_name = add_name
 
+        # widgets are stored in one dict
+        # per widget type
         self.entries = {}
         self.buttons = {}
         self.labels = {}
@@ -15,13 +38,15 @@ class VideoLoaderView(View):
         self.config_window()
 
     def create_view(self):
-        """Create all app's widgets
+        """Create all frame's widgets
         """
-        self.buttons["select_video"] = tk.Button(self, text="Select video")
-        self.buttons["select_video"].grid(row=0, column=0, sticky="nsew")
+        select_key = f"select_{self.add_name}"
+        self.buttons[select_key] = tk.Button(
+            self, text=f"Select {self.add_name}")
+        self.buttons[select_key].grid(row=0, column=0, sticky="nsew")
 
-        self.labels["select_video"] = tk.Label(self)
-        self.labels["select_video"].grid(row=1, column=0, sticky="nsew")
+        self.labels[select_key] = tk.Label(self)
+        self.labels[select_key].grid(row=1, column=0, sticky="nsew")
 
         # URL entry
         frm_label = "URL (optional)"
@@ -41,62 +66,30 @@ class VideoLoaderView(View):
         return frm
 
     def config_window(self):
-        """Configure app's root node (tk.Tk()) i.e. self
+        """Configure master and self.
         """
         # resizable window
         self.master.resizable(width=True, height=False)
         self.master.rowconfigure(0,  weight=1)
         self.master.columnconfigure(0, weight=1)
-        self.master.title("Add video to database")
+        self.master.title(f"Add {self.add_name} to database")
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure([0, 1, 2, 3], weight=1)
         self.grid(row=0, column=0, sticky="nsew")
 
 
-class PGNLoaderView(View):
+class VideoLoaderView(LoaderView):
     def __init__(self, master=None, height=0):
-        super().__init__(master)
-        self.master = master
-        self.height = height
-
-        self.entries = {}
-        self.buttons = {}
-        self.labels = {}
-
-        self.config_window()
-
-    def create_view(self):
-        """Create all app's widgets
+        """Inherits from LoaderView and fix the
+        value of the add_name argument to "video".
         """
+        super().__init__(master=master, add_name="video")
 
-        self.buttons["select_pgn"] = tk.Button(self, text="Select PGN")
-        self.buttons["select_pgn"].grid(row=0, column=0, sticky="nsew")
 
-        self.labels["select_pgn"] = tk.Label(self)
-        self.labels["select_pgn"].grid(row=1, column=0, sticky="nsew")
-
-        # URL entry
-        frm_label = "URL (optional)"
-        self.frm_url = tk.LabelFrame(self, text=frm_label)
-        self.frm_url.columnconfigure(0, weight=1)
-        self.entries["URL"] = tk.Entry(self.frm_url)
-        self.entries["URL"].grid(row=0, column=0, sticky="nsew")
-        self.frm_url.grid(row=2, column=0, sticky="nsew")
-
-        # Download menu
-        self.buttons["Add"] = tk.Button(self, text="Add")
-        self.buttons["Add"].grid(row=3, column=0, sticky="nsew")
-
-    def config_window(self):
-        """Configure app's root node (tk.Tk()) i.e., self
+class PGNLoaderView(LoaderView):
+    def __init__(self, master=None, height=0):
+        """Inherits from LoaderView and fix the
+        value of the add_name argument to "pgn".
         """
-        # resizable window
-        self.master.resizable(width=True, height=False)
-        self.master.rowconfigure(0, weight=1)
-        self.master.columnconfigure(0, weight=1)
-        self.master.title("Add PGN to database")
-        # resizable view
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure([0, 1, 2, 3], weight=1)
-        self.grid(row=0, column=0, sticky="nsew")
+        super().__init__(master=master, add_name="pgn")
