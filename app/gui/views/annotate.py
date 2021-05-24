@@ -8,43 +8,68 @@ from app import utils, chess2fen
 
 class ChessFenAnnotatorView(View, ButtonsMixin):
     def __init__(self, master=None, img_prop=0.8, height=0):
+        """App's main window, made of two main subframes.
+        One frame is used to display an image representation
+        of the chessboard based on a pgn file.
+
+        The other is used to display the frames from a video
+        of the live chess game.
+
+        Args:
+            master (tk.Tk, optional): tkinter root. Defaults to None.
+            img_prop (float, optional): the images height are
+                80% of the window's height. Defaults to 0.8.
+            height (int, optional): window height. Defaults to 0.
+        """
         View.__init__(self, master)
         ButtonsMixin.__init__(self)
 
         self.master = master
         self.img_prop = img_prop
         self.height = height
-        self.config_window()
 
+        # widgets are grouped per type
         self.frames = {}
         self.menus = {}
 
-    def create_view(self):
-        self.container = tk.Frame(master=self)
-        self.container.rowconfigure(0,  weight=5)
-        self.container.rowconfigure(1,  weight=1)
-        self.container.columnconfigure(0, weight=1)
-        self.container.grid(row=0, column=0, sticky="nsew")
+        self.config_window()
 
-        # middle
-        self.imgs = tk.Frame(master=self.container)
+    def create_view(self):
+        """Display frame's widgets
+        """
+        self.create_imgs_frame()
+        self.create_bottom_buttons_frame()
+
+    def create_imgs_frame(self):
+        """Frame containing the two subframes
+        displaying images (pgn and video)
+        """
+        self.imgs = tk.Frame(master=self)
         self.imgs.rowconfigure(0,  weight=1)
         self.imgs.columnconfigure([0, 1], weight=1)
         self.imgs.grid(row=0, column=0, sticky="nsew")
-
+        # frame to display pgn file
         self.frames["pgn"] = PGNFrame(self.imgs,
                                       img_prop=self.img_prop,
                                       height=self.height)
         self.frames["pgn"].create_view()
         self.frames["pgn"].grid(row=0, column=0, sticky="nsew")
-
+        # frame to display video frames
         self.frames["video"] = VideoFrame(self.imgs,
                                           img_prop=self.img_prop,
                                           height=self.height)
         self.frames["video"].create_view()
         self.frames["video"].grid(row=0, column=1, sticky="nsew")
 
-        # bottom
+    def create_bottom_buttons_frame(self):
+        """frame containing the buttons at the bottom
+        of the page:
+
+        * start_button: start annotation
+        * end_button: stop and save current annotation
+        * cancel_button: stop annotation and reset
+        * export_button: export annotations from db to file
+        """
         self.bottom_btns = tk.Frame(master=self)
         self.bottom_btns.rowconfigure(0,  weight=1)
         self.bottom_btns.columnconfigure([0, 1, 2, 3], weight=1)
@@ -69,7 +94,7 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         self.buttons["export_button"].grid(row=0, column=3, sticky="nsew")
 
     def config_window(self):
-        """Configure app's root node (tk.Tk()) i.e. self
+        """Configure Parent window and frame.
         """
         self.master.resizable(True, True)
         self.master.rowconfigure(0,  weight=1)
@@ -77,14 +102,25 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         self.master.title("Chess video FEN annotator")
 
         self.columnconfigure(0, weight=1)
-        # self.columnconfigure(1, weight=2)
-
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure([0, 1], weight=1)
         self.grid(row=0, column=0, sticky="nsew")
 
 
 class PGNFrame(tk.Frame, ButtonsMixin):
-    def __init__(self, master=None, img_prop=0.9, height=0, max_chars_pgn_list=40):
+    def __init__(self, master=None, img_prop=0.8, height=0,
+                 max_chars_pgn_list=40):
+        """Frame to display image representations of PGN file.
+        Image is displayed in the central label.
+
+        Args:
+            master (tk.Tk/tk.Frame, optional): tkinter parent. Defaults to None.
+            img_prop (float, optional): the images height are
+                80% of the window's height. Defaults to 0.8.
+            height (int, optional): main window's height. Defaults to 0.
+            max_chars_pgn_list (int, optional): only the first max_chars_pgn_list
+                characters of a pgn file name are displayed in the
+                "select_pgn" option menu. Defaults to 40.
+        """
         tk.Frame.__init__(self, master)
         ButtonsMixin.__init__(self)
 
@@ -101,13 +137,20 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         self.config_window()
 
     def create_view(self):
-        # Label frame container
+        """Frame containing three rows:
+        * first row contains one button (add pgn to database) and
+            one option menu (select pgn from database)
+        * second row contains one label to display a chessboard image
+        * third row contains one button (skip to the next image)
+        """
+        # Main container
         self.container = tk.LabelFrame(master=self, text="Moves")
         self.container.rowconfigure([0, 2],  weight=1)
         self.container.rowconfigure(1,  weight=2)
         self.container.columnconfigure(0,  weight=1)
         self.container.grid(row=0, column=0, sticky="nsew")
 
+        # first row container
         self.select_frm = tk.Frame(master=self.container)
         self.select_frm.rowconfigure(0,  weight=1)
         self.select_frm.columnconfigure(0,  weight=1)
@@ -123,16 +166,15 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         self.buttons["select_pgn"] = tk.OptionMenu(master=self.select_frm,
                                                    variable=self.string_vars["select_pgn"],
                                                    value=self.default_select_option)
-        # self.disable_button("select_pgn")
         self.buttons["select_pgn"].grid(row=0, column=1, sticky="nsew")
 
-        # chess fen
+        # second row label
         self.labels["fen"] = tk.Label(
             master=self.container)
         self.labels["fen"].grid(row=1, column=0, sticky="nsew")
         self.set_image(chess2fen.create_empty_board())
 
-        # skip fen button
+        # third row next image button
         self.buttons["skip_fen"] = tk.Button(
             master=self.container,
             text="Skip(Space)",
@@ -140,7 +182,7 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         self.buttons["skip_fen"].grid(row=2, column=0, sticky="nsew")
 
     def config_window(self):
-        """Configure app's root node (tk.Tk()) i.e. self
+        """Configure frame
         """
         self.rowconfigure(0,  weight=1)
         self.columnconfigure(0, weight=1)
@@ -157,8 +199,9 @@ class PGNFrame(tk.Frame, ButtonsMixin):
 
     def set_image(self, image):
         """Take a PIL image and save it
-        as an attribute of the view.
-        Display the image in the video label.
+        as an attribute of the frame.
+        Resize the image to img_prop * height.
+        Display the image in the label.
 
         Args:
             image (PIL.Image)
@@ -169,10 +212,12 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         self.display_image(image)
 
     def update_pgn_list(self, options):
-        """Change list of pgn in the menu button
+        """Update the list of options in the option
+        menu "select_pgn".
 
         Args:
-            options (list of str): list of pgn ids
+            options (list of str): list of options
+                to display.
         """
         if len(options) > 0:
             menu = self.buttons["select_pgn"]["menu"]
@@ -183,6 +228,16 @@ class PGNFrame(tk.Frame, ButtonsMixin):
                                  self.string_vars["select_pgn"].set(value))
 
     def get_selected_pgn(self):
+        """Get the value currently selected in the
+        "select_pgn" option menu.
+
+        If the selected option is the default option,
+        an empty string is returned (this means no option
+        is selected).
+
+        Returns:
+            str: selected option
+        """
         pgn_variable = self.string_vars["select_pgn"]
         pgn_name = pgn_variable.get()
 
@@ -192,8 +247,21 @@ class PGNFrame(tk.Frame, ButtonsMixin):
 
 
 class VideoFrame(tk.Frame, ButtonsMixin):
-    def __init__(self, master=None, height=0, img_prop=0.9,
+    def __init__(self, master=None, height=0, img_prop=0.8,
                  max_chars_vid_list=80):
+        """Frame to display and navigate frames from a chess game
+        video.
+        Frame is displayed in the central label.
+
+        Args:
+            master (tk.Tk/tk.Frame, optional): tkinter parent. Defaults to None.
+            height (int, optional): main window's height. Defaults to 0.
+            img_prop (float, optional): the images height are
+                80% of the window's height. Defaults to 0.8.
+            max_chars_pgn_list (int, optional): only the first max_chars_pgn_list
+                characters of a pgn file name are displayed in the
+                "select_video" option menu. Defaults to 80.
+        """
 
         tk.Frame.__init__(self, master)
         ButtonsMixin.__init__(self)
@@ -211,7 +279,9 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.config_window()
 
     def create_view(self):
-        # Label frame container
+        """Display frame's widgets
+        """
+        # Main container
         self.container = tk.LabelFrame(master=self, text="Frames")
         self.container.rowconfigure([0, 2],  weight=1)
         self.container.rowconfigure(1,  weight=2)
@@ -219,10 +289,22 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.container.columnconfigure(0, weight=1)
         self.container.grid(row=0, column=0, sticky="nsew")
 
-        # add and select video
-        # select video and fps
+        # video management
+        self.create_video_selection(self.container)
+        # video image
+        self.labels["frame"] = tk.Label(
+            master=self.container)
+        self.labels["frame"].grid(row=1, column=0, sticky="nsew")
+        self.set_image(Image.new('RGB', (1280, 720)))
+        # navigate frames
+        self.create_navigation_buttons()
 
-        self.selection_frm = tk.Frame(master=self.container)
+    def create_video_selection(self, master):
+        """Frame containing buttons to load a video
+        to database, select a video from database
+        and select a fps ratio
+        """
+        self.selection_frm = tk.Frame(master=master)
         self.selection_frm.columnconfigure(0, weight=1)
         self.selection_frm.columnconfigure(1, weight=2)
         self.selection_frm.columnconfigure(2, weight=1)
@@ -240,8 +322,6 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.buttons["select_video"] = tk.OptionMenu(master=self.selection_frm,
                                                      variable=self.string_vars["select_video"],
                                                      value=self.default_video_option)
-        # https://stackoverflow.com/questions/7393430/how-can-i-dynamic-populate-an-option-widget-in-tkinter-depending-on-a-choice-fro/7403530#7403530
-        # self.disable_button("video")
         self.buttons["select_video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
@@ -252,14 +332,13 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.buttons["fps_ratio"] = tk.OptionMenu(self.selection_frm,
                                                   self.string_vars["fps_ratio"],
                                                   *fps_options)
-        # self.disable_button("fps")
         self.buttons["fps_ratio"].grid(row=0, column=2, sticky="nsew")
-        # video image
-        self.labels["frame"] = tk.Label(
-            master=self.container)
-        self.labels["frame"].grid(row=1, column=0, sticky="nsew")
-        self.set_image(Image.new('RGB', (1280, 720)))
 
+    def create_navigation_buttons(self):
+        """Frame containing buttons to navigate
+        video frames (previous, next) and save/unsave
+        a frame.
+        """
         # frames navigation buttons
         self.frm_images_buttons = tk.Frame(master=self.container)
         self.frm_images_buttons.grid(row=2, column=0, sticky="nsew")
@@ -300,7 +379,7 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.labels["saved"].grid(row=0, column=2, sticky="nsew")
 
     def config_window(self):
-        """Configure app's root node (tk.Tk()) i.e. self
+        """Configure frame
         """
         self.rowconfigure(0,  weight=1)
         self.columnconfigure(0, weight=1)
@@ -317,8 +396,9 @@ class VideoFrame(tk.Frame, ButtonsMixin):
 
     def set_image(self, image):
         """Take a PIL image and save it
-        as an attribute of the view.
-        Display the image in the video label.
+        as an attribute of the frame.
+        Resize the image to img_prop * height.
+        Display the image in the label.
 
         Args:
             image (PIL.Image)
@@ -329,10 +409,12 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.display_image(image)
 
     def update_video_list(self, options):
-        """Change list of video in the menu button
+        """Update the list of options in the option
+        menu "select_video".
 
         Args:
-            options (list of str): list of video ids
+            options (list of str): list of options
+                to display.
         """
         if len(options) > 0:
             menu = self.buttons["select_video"]["menu"]
@@ -343,6 +425,16 @@ class VideoFrame(tk.Frame, ButtonsMixin):
                                  self.string_vars["select_video"].set(value))
 
     def get_selected_video(self):
+        """Get the value currently selected in the
+        "select_video" option menu.
+
+        If the selected option is the default option,
+        an empty string is returned (this means no option
+        is selected).
+
+        Returns:
+            str: selected option
+        """
         video_variable = self.string_vars["select_video"]
         video_name = video_variable.get()
 
@@ -351,6 +443,16 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         return video_name
 
     def get_selected_fps_ratio(self):
+        """Get the value currently selected in the
+        "fps_ratio" option menu.
+
+        If the selected option is the default option,
+        an empty string is returned (this means no option
+        is selected).
+
+        Returns:
+            str: selected option
+        """
         fps_variable = self.string_vars["fps_ratio"]
         fps = fps_variable.get()
 

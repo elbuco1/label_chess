@@ -21,6 +21,7 @@ class ExportDialog(simpledialog.Dialog):
         self.options = options
         self.check_boxes = {}
         self.vars = {}
+        self.checks = []
         super().__init__(parent, title)
 
     def body(self, frame):

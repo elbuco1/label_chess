@@ -1,16 +1,21 @@
+import shutil
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String, \
     ForeignKey, Table
 
-import shutil
-import os
 
 DB_PATH = "sqlite:///db.sqlite"
 ENGINE = create_engine(url=DB_PATH)
 SESSION = sessionmaker(bind=ENGINE)
 BASE = declarative_base(bind=ENGINE)
+
+# create one directory per type in the database
+# artefacts are copied/saved to this directories
+# TODO make it work with .exe (absolute paths)
 DB_DATA_DIR = "database"
 VIDEO_DATA_DIR = os.path.join(DB_DATA_DIR, "video")
 PGN_DATA_DIR = os.path.join(DB_DATA_DIR, "pgn")
@@ -37,7 +42,7 @@ def init_db(clear=False):
 
 
 def get_db():
-    """Get a database session.
+    """Get an slalchemy database session.
     """
     db = SESSION()
     return db
