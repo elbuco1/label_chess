@@ -444,9 +444,14 @@ class ChessFenAnnotatorController(Controller):
             os.path.split(ann.csv_path)[1] for ann in anns]
         checked_anns = views.export.export_dialog(self.view, options)
 
+        if len(checked_anns) == 0:
+            return
+
         # open a dialog to ask the user for a directory where
         # to export the annotations.
         export_dir = filedialog.askdirectory()
+        if not export_dir:
+            return
 
         try:
             # for each selected annotation file
@@ -504,7 +509,7 @@ class ChessFenAnnotatorController(Controller):
             self.current_frame += 1
 
             if self.current_frame > -1 and \
-                    self.current_frame < len(self.frames)-1:
+                    self.current_frame < len(self.frames):
                 next_frame = self.frames[self.current_frame][-1]
             else:
                 next_img, frame_number = next(self.frame_generator)
@@ -513,6 +518,7 @@ class ChessFenAnnotatorController(Controller):
             self.view.frames["video"].set_image(next_frame)
 
         except StopIteration:
+            print(traceback.print_exc())
             self.current_frame -= 1
             self.update_states(caller="next_frame_empty")
             return
@@ -530,7 +536,8 @@ class ChessFenAnnotatorController(Controller):
         self.update_states(caller="previous_frame")
 
     def save_frame(self, event=None):
-        """
+        """Add current fen and frame to the lists
+        of saved frames/fen and display next frame/fen
         """
         self.last_saved_frame.append(self.current_frame)
         self.last_saved_fen.append(self.current_fen)
@@ -541,7 +548,13 @@ class ChessFenAnnotatorController(Controller):
         self.update_states(caller="save_frame")
 
     def unsave_frame(self):
-        """Revert the last saved frame
+        """Revert the last saved frame.
+        Remove the last element of the lists
+        of save fens and saved frames.
+        Set the current fen position to the one
+        of the previously saved fen. (since fens
+        can be skipped we can't just go back to
+        self.current_fen - 1)
         """
         # if at least one frame has been saved
         if len(self.last_saved_frame) > 1:
