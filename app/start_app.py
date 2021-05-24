@@ -4,10 +4,15 @@ import argparse
 
 
 class ChessAnnotatorApp(tk.Tk):
-    """App's entrypoint
-    """
-
     def __init__(self, width=16/7, height=4/7):
+        """App's entrypoint
+
+        Args:
+            width (float, optional): width of the app's main window is
+                width * app's height. Defaults to 16/7.
+            height (float, optional): height of the app's main window
+                is height * window height. Defaults to 4/7.
+        """
         super().__init__()
         controllers.open_window(
             root=self,
