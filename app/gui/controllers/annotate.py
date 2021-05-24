@@ -1,18 +1,17 @@
+from PIL import Image
+import os
+import pathlib
+import shutil
+import pandas as pd
+
 import tkinter as tk
 from tkinter import filedialog, simpledialog
 from tkinter import messagebox
 import traceback
 
-from PIL import Image, ImageTk
-import os
-import pathlib
-import json
-import shutil
-import time
 from app import utils, chess2fen
 from app.gui.base import Controller
 from app.gui import views, controllers, models
-import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
@@ -383,7 +382,7 @@ class ChessFenAnnotatorController(Controller):
             self.current_frame -= 2
             self.get_next_frame()
 
-        self.update_states(caller="previous_frame")  # TODO decorator?
+        self.update_states(caller="previous_frame")
 
     def save_frame(self, event=None):
         """
