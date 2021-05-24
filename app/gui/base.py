@@ -1,5 +1,6 @@
-import tkinter as tk
 import abc
+
+import tkinter as tk
 
 
 class Controller(abc.ABC):

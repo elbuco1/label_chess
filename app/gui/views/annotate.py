@@ -1,5 +1,6 @@
-import tkinter as tk
 from PIL import Image, ImageTk
+
+import tkinter as tk
 
 from app.gui.base import View, ButtonsMixin
 from app import utils, chess2fen

@@ -1,4 +1,5 @@
 import tkinter as tk
+
 from app.gui.base import View
 
 
