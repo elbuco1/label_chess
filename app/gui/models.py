@@ -1,5 +1,6 @@
 import shutil
 import os
+import pathlib
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -15,8 +16,9 @@ BASE = declarative_base(bind=ENGINE)
 
 # create one directory per type in the database
 # artefacts are copied/saved to this directories
-# TODO make it work with .exe (absolute paths)
-DB_DATA_DIR = "database"
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
+DB_DATA_DIR = os.path.join(ROOT, "database")
 VIDEO_DATA_DIR = os.path.join(DB_DATA_DIR, "video")
 PGN_DATA_DIR = os.path.join(DB_DATA_DIR, "pgn")
 ANNOTATIONS_DATA_DIR = os.path.join(DB_DATA_DIR, "annotations")

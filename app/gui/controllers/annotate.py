@@ -13,7 +13,7 @@ from app import utils, chess2fen
 from app.gui.base import Controller
 from app.gui import views, controllers, models
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")
 
 
