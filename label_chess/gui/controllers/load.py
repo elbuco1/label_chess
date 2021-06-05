@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import shutil
 
@@ -5,8 +8,8 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 
-from app.gui import models
-from app.gui.base import Controller
+from label_chess.gui import models
+from label_chess.gui.base import Controller
 
 
 class LoaderController(Controller):

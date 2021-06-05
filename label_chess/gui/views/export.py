@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import tkinter as tk
 from tkinter import simpledialog
 
-from app.gui.base import View
+from label_chess.gui.base import View
 
 
 class ExportDialog(simpledialog.Dialog):

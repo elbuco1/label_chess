@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from PIL import Image, ImageDraw
 import numpy as np
 import os

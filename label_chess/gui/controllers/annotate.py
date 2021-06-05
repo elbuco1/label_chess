@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from PIL import Image
 import os
 import pathlib
@@ -9,9 +12,9 @@ from tkinter import filedialog, simpledialog
 from tkinter import messagebox
 import traceback
 
-from app import utils, chess2fen
-from app.gui.base import Controller
-from app.gui import views, controllers, models
+from label_chess import utils, chess2fen
+from label_chess.gui.base import Controller
+from label_chess.gui import views, controllers, models
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent.parent
 PIECES_PATH = os.path.join(ROOT, "resources/pieces")

@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from PIL import Image, ImageTk
 
 import tkinter as tk
 
-from app.gui.base import View, ButtonsMixin
-from app import utils, chess2fen
+from label_chess.gui.base import View, ButtonsMixin
+from label_chess import utils, chess2fen
 
 
 class ChessFenAnnotatorView(View, ButtonsMixin):
@@ -76,7 +79,7 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         self.bottom_btns.grid(row=1, column=0, sticky="nsew")
 
         self.buttons["start_button"] = tk.Button(
-            self.bottom_btns, text="START")
+            self.bottom_btns, text="START", bg="red")
         self.buttons["start_button"].grid(row=0, column=0, sticky="nsew")
 
         self.buttons["end_button"] = tk.Button(
