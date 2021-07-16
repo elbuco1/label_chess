@@ -16,9 +16,6 @@ from label_chess import utils, pgn2imgs
 from label_chess.gui.base import Controller
 from label_chess.gui import views, controllers, models
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent.parent.parent
-PIECES_PATH = os.path.join(ROOT, "resources/pieces")
-
 
 def center_window(win, width, height):
     """Display a tkinter window at the center
@@ -81,8 +78,6 @@ class ChessFenAnnotatorController(Controller):
         positions and manage annotations.
         """
         self.view = None
-        # path to the chess pieces images
-        self.pieces_path = PIECES_PATH
         # when frame is saved popup appears with
         # this color
         self.save_color = "#2CE26E"
