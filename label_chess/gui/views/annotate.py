@@ -6,7 +6,9 @@ from PIL import Image, ImageTk
 import tkinter as tk
 
 from label_chess.gui.base import View, ButtonsMixin
-from label_chess import utils, chess2fen
+from label_chess import utils
+
+from fen2pil import draw
 
 
 class ChessFenAnnotatorView(View, ButtonsMixin):
@@ -79,7 +81,7 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         self.bottom_btns.grid(row=1, column=0, sticky="nsew")
 
         self.buttons["start_button"] = tk.Button(
-            self.bottom_btns, text="START", bg="red")
+            self.bottom_btns, text="START")
         self.buttons["start_button"].grid(row=0, column=0, sticky="nsew")
 
         self.buttons["end_button"] = tk.Button(
@@ -175,7 +177,7 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         self.labels["fen"] = tk.Label(
             master=self.container)
         self.labels["fen"].grid(row=1, column=0, sticky="nsew")
-        self.set_image(chess2fen.create_empty_board())
+        self.set_image(draw.create_empty_board())
 
         # third row next image button
         self.buttons["skip_fen"] = tk.Button(

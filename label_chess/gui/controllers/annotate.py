@@ -12,7 +12,7 @@ from tkinter import filedialog, simpledialog
 from tkinter import messagebox
 import traceback
 
-from label_chess import utils, chess2fen
+from label_chess import utils, pgn2imgs
 from label_chess.gui.base import Controller
 from label_chess.gui import views, controllers, models
 
@@ -362,9 +362,8 @@ class ChessFenAnnotatorController(Controller):
             models.PGN, pgn_name)
 
         # load fens and chessboard representations
-        self.fens = chess2fen.get_game_board_images(
+        self.fens = pgn2imgs.get_game_board_images(
             self.pgn.path,
-            self.pieces_path
         )
         # display first fen's image
         self.get_next_fen()
