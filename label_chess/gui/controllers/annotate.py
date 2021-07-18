@@ -99,6 +99,16 @@ class ChessFenAnnotatorController(Controller):
         # to the database (proportion of the height)
         self.add_win_width = 2
 
+        # select a subset of the image using a rectangle bounding
+        # box defined based on bottom left and top right corners.
+        # values are expressed between 0 and 100% of a the given dimension
+        # (height or width)
+        self.top_left_x = 0
+        self.top_left_y = 0
+        self.bottom_right_x = 100
+        self.bottom_right_y = 100
+
+
         # init variables to keep track of
         # annotations
         self.setup_variables()

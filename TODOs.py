@@ -1,6 +1,11 @@
-# TODO pip package pgn to pngs
-# TODO automatically generate .exe with github actions (nouveau repo)
+# TODO pip package pgn to pngs x
+# TODO try ttk ubuntu
 # TODO select subset of image
+# TODO characters display (up, down etc...)
+
+# TODO automatically generate .exe with github actions (nouveau repo)
+
+
 # include resources
 # reset and create app before pyinstaller
 # set colors for non macos dists

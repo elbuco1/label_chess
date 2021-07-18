@@ -281,6 +281,7 @@ class VideoFrame(tk.Frame, ButtonsMixin):
 
         self.labels = {}
         self.string_vars = {}
+        self.sliders = {}
         self.config_window()
 
     def create_view(self):
@@ -297,12 +298,9 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         # video management
         self.create_video_selection(self.container)
         # video image
-        self.labels["frame"] = tk.Label(
-            master=self.container)
-        self.labels["frame"].grid(row=1, column=0, sticky="nsew")
-        self.set_image(Image.new('RGB', (1280, 720)))
+        self.create_frame_sliders(self.container)
         # navigate frames
-        self.create_navigation_buttons()
+        self.create_navigation_buttons(self.container)
 
     def create_video_selection(self, master):
         """Frame containing buttons to load a video
@@ -338,14 +336,82 @@ class VideoFrame(tk.Frame, ButtonsMixin):
                                                   self.string_vars["fps_ratio"],
                                                   *fps_options)
         self.buttons["fps_ratio"].grid(row=0, column=2, sticky="nsew")
+    
 
-    def create_navigation_buttons(self):
+    def create_frame_sliders(self, master):
+        """Frame containing img from chess game video and
+        sliders to select a part of the img.
+        """
+        # container for img + sliders
+        self.frm_img = tk.Frame(master=master)
+        self.frm_img.rowconfigure([0,1,2], weight=1)
+        self.frm_img.columnconfigure(0, weight=1)
+        self.frm_img.grid(row=1, column=0, sticky="nsew")
+
+        # sub container for image and right side vertical sliders
+        self.frm_img_right_slider = tk.Frame(master=self.frm_img)
+        self.frm_img_right_slider.columnconfigure([0,1,2], weight=1)
+        self.frm_img_right_slider.rowconfigure(0, weight=1)
+
+        self.frm_img_right_slider.grid(row=1, column=0, sticky="nsew")
+
+        # img
+        self.labels["frame"] = tk.Label(
+            master=self.frm_img_right_slider)
+        self.labels["frame"].grid(row=0, column=1, sticky="nsew")
+        self.set_image(Image.new('RGB', (1280, 720)))
+
+        # side sliders
+        self.sliders["slider_left"] = tk.Scale(
+            master=self.frm_img_right_slider,
+            from_= 0,
+            to=100,
+            width = 10,
+            showvalue=False
+            )
+        self.sliders["slider_left"].set(0)
+        self.sliders["slider_left"].grid(row=0, column=0, sticky="nsew")
+
+        self.sliders["slider_right"] = tk.Scale(
+            master=self.frm_img_right_slider,
+            from_= 0,
+            to=100,
+            width = 10,
+            showvalue=False
+            )
+        self.sliders["slider_right"].set(100)
+        self.sliders["slider_right"].grid(row=0, column=2, sticky= "nsew")
+
+        # bottom sliders
+        self.sliders["slider_top"] = tk.Scale(
+            master=self.frm_img,
+            from_= 0,
+            to=100,
+            width = 10,
+            orient=tk.HORIZONTAL,
+            showvalue=False
+            )
+        self.sliders["slider_top"].set(0)
+        self.sliders["slider_top"].grid(row=0, column=0, sticky="nsew")
+
+        self.sliders["slider_bottom"] = tk.Scale(
+            master=self.frm_img,
+            from_= 0,
+            to=100,
+            width = 10,
+            orient=tk.HORIZONTAL,
+            showvalue=False
+            )
+        self.sliders["slider_bottom"].set(100)
+        self.sliders["slider_bottom"].grid(row=2, column=0, sticky="nsew")
+
+    def create_navigation_buttons(self, master):
         """Frame containing buttons to navigate
         video frames (previous, next) and save/unsave
         a frame.
         """
         # frames navigation buttons
-        self.frm_images_buttons = tk.Frame(master=self.container)
+        self.frm_images_buttons = tk.Frame(master=master)
         self.frm_images_buttons.grid(row=2, column=0, sticky="nsew")
         self.frm_images_buttons.rowconfigure(0,  weight=1)
         self.frm_images_buttons.columnconfigure([0, 1, 2, 3, 4], weight=1)
