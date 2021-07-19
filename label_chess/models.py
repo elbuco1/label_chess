@@ -20,8 +20,8 @@ BASE = declarative_base(bind=ENGINE)
 # create one directory per type in the database
 # artefacts are copied/saved to this directories
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
-DB_DATA_DIR = os.path.join(ROOT, "database")
+ROOT = pathlib.Path.home()
+DB_DATA_DIR = os.path.join(ROOT, "label_chess_database")
 VIDEO_DATA_DIR = os.path.join(DB_DATA_DIR, "video")
 PGN_DATA_DIR = os.path.join(DB_DATA_DIR, "pgn")
 ANNOTATIONS_DATA_DIR = os.path.join(DB_DATA_DIR, "annotations")

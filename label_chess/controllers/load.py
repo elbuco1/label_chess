@@ -94,7 +94,7 @@ class LoaderController(Controller):
                                    "already exists in database")
             return
 
-        db_path = os.path.join(models.VIDEO_DATA_DIR,
+        db_path = os.path.join(self.db_dir,
                                name)
 
         # add file to database
