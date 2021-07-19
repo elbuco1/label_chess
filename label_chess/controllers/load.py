@@ -8,8 +8,8 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 
-from label_chess.gui import models
-from label_chess.gui.base import Controller
+from label_chess import models
+from label_chess.base import Controller
 
 
 class LoaderController(Controller):

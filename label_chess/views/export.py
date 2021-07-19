@@ -4,8 +4,6 @@
 import tkinter as tk
 from tkinter import simpledialog
 
-from label_chess.gui.base import View
-
 
 class ExportDialog(simpledialog.Dialog):
     def __init__(self, parent, title, options):

@@ -13,8 +13,8 @@ from tkinter import messagebox
 import traceback
 
 from label_chess import utils, pgn2imgs
-from label_chess.gui.base import Controller
-from label_chess.gui import views, controllers, models
+from label_chess.base import Controller
+from label_chess import views, controllers, models
 
 
 def center_window(win, width, height):

@@ -5,7 +5,7 @@ from PIL import Image, ImageTk, ImageDraw
 
 import tkinter as tk
 
-from label_chess.gui.base import View, ButtonsMixin
+from label_chess.base import View, ButtonsMixin
 from label_chess import utils
 
 from fen2pil import draw
