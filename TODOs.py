@@ -1,7 +1,7 @@
 # TODO pip package pgn to pngs x
-# TODO try ttk ubuntu
-# TODO select subset of image
-# TODO characters display (up, down etc...)
+# TODO select subset of image x
+# TODO characters display (up, down etc...) x
+# TODO review aspect of add video/pgn and export subwindows <-
 
 # TODO automatically generate .exe with github actions (nouveau repo)
 

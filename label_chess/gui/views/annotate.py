@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw
 
 import tkinter as tk
 
@@ -101,7 +101,7 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
     def config_window(self):
         """Configure Parent window and frame.
         """
-        self.master.resizable(True, True)
+        self.master.resizable(False, False)
         self.master.rowconfigure(0,  weight=1)
         self.master.columnconfigure(0, weight=1)
         self.master.title("Chess video FEN annotator")
@@ -281,7 +281,6 @@ class VideoFrame(tk.Frame, ButtonsMixin):
 
         self.labels = {}
         self.string_vars = {}
-        self.sliders = {}
         self.config_window()
 
     def create_view(self):
@@ -362,48 +361,64 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.set_image(Image.new('RGB', (1280, 720)))
 
         # side sliders
-        self.sliders["slider_left"] = tk.Scale(
+        self.buttons["slider_left"] = tk.Scale(
             master=self.frm_img_right_slider,
             from_= 0,
             to=100,
             width = 10,
-            showvalue=False
+            showvalue=False,
+            sliderlength=10
             )
-        self.sliders["slider_left"].set(0)
-        self.sliders["slider_left"].grid(row=0, column=0, sticky="nsew")
+        self.buttons["slider_left"].set(0)
+        self.buttons["slider_left"].grid(row=0, column=0, sticky="nsew")
+        self.disable_button("slider_left")
 
-        self.sliders["slider_right"] = tk.Scale(
+
+        self.buttons["slider_right"] = tk.Scale(
             master=self.frm_img_right_slider,
             from_= 0,
             to=100,
             width = 10,
-            showvalue=False
+            showvalue=False,
+            sliderlength=10
             )
-        self.sliders["slider_right"].set(100)
-        self.sliders["slider_right"].grid(row=0, column=2, sticky= "nsew")
+        self.buttons["slider_right"].set(100)
+        self.buttons["slider_right"].grid(row=0, column=2, sticky= "nsew")
+        self.disable_button("slider_right")
+
+        # align top and bottom sliders to image width
+        aspect_ratio = 9/16
+        img_width_prop = 35/1000
+        padding = int(self.height * aspect_ratio * img_width_prop)
 
         # bottom sliders
-        self.sliders["slider_top"] = tk.Scale(
+        self.buttons["slider_top"] = tk.Scale(
             master=self.frm_img,
             from_= 0,
             to=100,
             width = 10,
             orient=tk.HORIZONTAL,
-            showvalue=False
+            showvalue=False,
+            sliderlength=10
             )
-        self.sliders["slider_top"].set(0)
-        self.sliders["slider_top"].grid(row=0, column=0, sticky="nsew")
+        self.buttons["slider_top"].set(0)
+        self.buttons["slider_top"].grid(row=0, column=0, sticky="nsew", padx=padding)
 
-        self.sliders["slider_bottom"] = tk.Scale(
+        self.disable_button("slider_top")
+
+        self.buttons["slider_bottom"] = tk.Scale(
             master=self.frm_img,
             from_= 0,
             to=100,
             width = 10,
             orient=tk.HORIZONTAL,
-            showvalue=False
+            showvalue=False,
+            sliderlength=10
             )
-        self.sliders["slider_bottom"].set(100)
-        self.sliders["slider_bottom"].grid(row=2, column=0, sticky="nsew")
+        self.buttons["slider_bottom"].set(100)
+        self.buttons["slider_bottom"].grid(row=2, column=0, sticky="nsew", padx=padding)
+        self.disable_button("slider_bottom")
+
 
     def create_navigation_buttons(self, master):
         """Frame containing buttons to navigate
@@ -419,28 +434,28 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         # previous frame button
         self.buttons["previous_frame"] = tk.Button(
             master=self.frm_images_buttons,
-            text="Previous(\N{LEFTWARDS BLACK ARROW})",
+            text="Previous(Left)",
             state="disabled")
         self.buttons["previous_frame"].grid(row=0, column=0, sticky="nsew")
 
         # save frame button
         self.buttons["save_frame"] = tk.Button(
             master=self.frm_images_buttons,
-            text="Save(\N{UPWARDS BLACK ARROW})",
+            text="Save(Up)",
             state="disabled")
         self.buttons["save_frame"].grid(row=0, column=1, sticky="nsew")
 
         # unsave frame button
         self.buttons["unsave_frame"] = tk.Button(
             master=self.frm_images_buttons,
-            text="Unsave(\N{DOWNWARDS BLACK ARROW})",
+            text="Unsave(Down)",
             state="disabled")
         self.buttons["unsave_frame"].grid(row=0, column=3, sticky="nsew")
 
         # next button
         self.buttons["next_frame"] = tk.Button(
             master=self.frm_images_buttons,
-            text="Next(\N{RIGHTWARDS BLACK ARROW})",
+            text="Next(Right)",
             state="disabled")
         self.buttons["next_frame"].grid(row=0, column=4, sticky="nsew")
 
@@ -465,18 +480,48 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.labels["frame"].configure(image=image)
         self.labels["frame"].image = image
 
-    def set_image(self, image):
+    def set_image(self, image, 
+            top_left=None,
+            bottom_right=None):
         """Take a PIL image and save it
         as an attribute of the frame.
         Resize the image to img_prop * height.
         Display the image in the label.
 
+        Draw rectangle on image.
+
+
         Args:
             image (PIL.Image)
+            top_left (tuple, optional): if specified, top left
+                corner of rectangle to draw on image. Position
+                is expressed as percentage of the image width
+                and height respectively. Defaults to None.
+            bottom_right (tuple, optional): if specified, bottom right.
+                corner of rectangle to draw on image. Position
+                is expressed as percentage of the image width
+                and height respectively. Defaults to None.
         """
         self.image = image
         height = int(self.img_prop * self.height)
         image = utils.resize_image(image, height)
+
+        if top_left is not None and bottom_right is not None:
+            draw = ImageDraw.Draw(image)
+            width, height = image.size
+
+            top_left = tuple([ 
+                int(top_left[0] * width / 100),
+                int(top_left[1] * height / 100)
+            ])
+
+            bottom_right = tuple([ 
+                int(bottom_right[0] * width / 100) -1,
+                int(bottom_right[1] * height / 100)-1
+            ])
+
+            draw.rectangle([top_left, bottom_right], 
+                outline = "red", width=3)
         self.display_image(image)
 
     def update_video_list(self, options):

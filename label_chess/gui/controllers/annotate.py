@@ -127,6 +127,7 @@ class ChessFenAnnotatorController(Controller):
         self.bind_add_video_window()
         self.bind_add_pgn_window()
         self.bind_annotation_management_btns()
+        self.bind_bbox_sliders()
         self.setup_keyboard_shortcuts()
 
     def bind_add_video_window(self):
@@ -207,6 +208,22 @@ class ChessFenAnnotatorController(Controller):
         self.view.buttons["export_button"].configure(
             command=self.export_annotation)
 
+    def bind_bbox_sliders(self):
+        """
+        Bind sliders to a method that draws bounding
+        box on game image.
+        """
+        sliders = self.view.frames["video"].buttons
+        sliders["slider_left"].configure(
+            command=self.update_bbox )
+        sliders["slider_right"].configure(
+            command=self.update_bbox )
+        sliders["slider_top"].configure(
+            command=self.update_bbox )
+        sliders["slider_bottom"].configure(
+            command=self.update_bbox )
+    
+
     def setup_keyboard_shortcuts(self):
         """ Bind keyboard to app's buttons
         """
@@ -251,6 +268,8 @@ class ChessFenAnnotatorController(Controller):
         self.last_saved_frame = [-1]
         # ids of the saved chess positions
         self.last_saved_fen = [-1]
+        # coordinates of saved bboxes
+        self.last_bbox = []
         # id of the current chess position
         self.current_fen = -1
         # list of tuples (fen string, image of chessboard)
@@ -386,19 +405,23 @@ class ChessFenAnnotatorController(Controller):
         # get the positions of the saved frames/fens
         saved_frames = self.last_saved_frame[1:]
         saved_fens = self.last_saved_fen[1:]
+        saved_bboxes = self.last_bbox
 
         # create a dataframe with one row per save
         rows = []
-        for fen_id, frame_id in zip(saved_fens, saved_frames):
+        for fen_id, frame_id, bbox in zip(saved_fens, saved_frames, saved_bboxes):
             # get the fen from the list and keep only
             # the string representation
             fen = self.fens[fen_id][0]
             # get the frame from the list of frames
             # and get the original frame id (before fps_ratio)
             frame = self.frames[frame_id][0]
-            row = [frame, fen]
+            row = [frame, fen, *bbox]
             rows.append(row)
-        df = pd.DataFrame(rows, columns=["frame_id", "fen"])
+        df = pd.DataFrame(rows, columns=[
+                "frame_id", "fen", "top_left_x", "top_left_y",
+                "bottom_right_x", "bottom_right_y"
+            ])
 
         # Get the list of annotations already in the database
         db = models.get_db()
@@ -506,6 +529,26 @@ class ChessFenAnnotatorController(Controller):
         next_fen = self.fens[self.current_fen][-1]
         self.view.frames["pgn"].set_image(next_fen)
 
+    def load_bbox_coordinates(self):
+        """
+        Get values from the game img sliders
+        """
+        sliders = self.view.frames["video"].buttons
+        self.top_left_y = sliders["slider_left"].get()
+        self.bottom_right_y = sliders["slider_right"].get()
+        self.top_left_x = sliders["slider_top"].get()
+        self.bottom_right_x = sliders["slider_bottom"].get()
+
+    def update_bbox(self, event=None):
+        """
+        Update game img sliders bbox value and
+        draw bbox on current image.
+        """
+        self.load_bbox_coordinates()
+        self.current_frame -= 1
+        self.get_next_frame()
+
+
     def get_next_frame(self, event=None):
         """Get next frame from generator and save it to self.frames
         then replace the current frame with the new frame.
@@ -522,7 +565,13 @@ class ChessFenAnnotatorController(Controller):
                 next_img, frame_number = next(self.frame_generator)
                 next_frame = Image.fromarray(next_img)
                 self.frames.append([frame_number, next_frame])
-            self.view.frames["video"].set_image(next_frame)
+
+            self.load_bbox_coordinates()
+            self.view.frames["video"].set_image(
+                next_frame,
+                top_left=(self.top_left_x, self.top_left_y),
+                bottom_right=(self.bottom_right_x, self.bottom_right_y)
+            )
 
         except StopIteration:
             print(traceback.print_exc())
@@ -543,11 +592,14 @@ class ChessFenAnnotatorController(Controller):
         self.update_states(caller="previous_frame")
 
     def save_frame(self, event=None):
-        """Add current fen and frame to the lists
-        of saved frames/fen and display next frame/fen
+        """Add current fen, frame and bbox to the lists
+        of saved frames/fen/bboxes and display next frame/fen
         """
         self.last_saved_frame.append(self.current_frame)
         self.last_saved_fen.append(self.current_fen)
+        self.last_bbox.append(
+            [ self.top_left_x, self.top_left_y,
+            self.bottom_right_x, self.bottom_right_y])
 
         self.get_next_frame()
         self.get_next_fen()
@@ -558,6 +610,8 @@ class ChessFenAnnotatorController(Controller):
         """Revert the last saved frame.
         Remove the last element of the lists
         of save fens and saved frames.
+        Remove the last saved bbox from the list
+        of saved bboxes.
         Set the current fen position to the one
         of the previously saved fen. (since fens
         can be skipped we can't just go back to
@@ -568,6 +622,7 @@ class ChessFenAnnotatorController(Controller):
             # get last saved frame and fen ids
             # and remove them from the save history
             self.last_saved_frame.pop()
+            self.last_bbox.pop()
             last_save_fen = self.last_saved_fen.pop()
             # plot the last save fen
             self.current_fen = last_save_fen - 1
@@ -618,6 +673,8 @@ class ChessFenAnnotatorController(Controller):
         self.setup_variables()
         self.bind_view(self.view)
 
+
+
     def update_states(self, caller):
         """Activation/Deactivation of components. To change state
         of components, methods should call this method. This allows
@@ -631,11 +688,20 @@ class ChessFenAnnotatorController(Controller):
             self.view.disable_button("start_button")
             self.view.activate_button("cancel_button")
             self.view.activate_button("end_button")
+            self.view.frames["video"].activate_button("slider_left")
+            self.view.frames["video"].activate_button("slider_right")
+            self.view.frames["video"].activate_button("slider_top")
+            self.view.frames["video"].activate_button("slider_bottom")
+
 
         elif caller == "end_annotation":
             self.view.activate_button("start_button")
             self.view.disable_button("cancel_button")
             self.view.disable_button("end_button")
+            self.view.frames["video"].disable_button("slider_left")
+            self.view.frames["video"].disable_button("slider_right")
+            self.view.frames["video"].disable_button("slider_top")
+            self.view.frames["video"].disable_button("slider_bottom")
 
         elif caller == "load_video":
             self.view.frames["video"].activate_button("next_frame")
