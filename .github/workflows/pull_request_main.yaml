@@ -79,11 +79,12 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
     steps:  
       - uses: actions/checkout@v2
-        - name: Set up Python 3.x
-          uses: actions/setup-python@v2
-          with:
-            python-version: '3.7'
-            architecture: 'x64'    
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'    
+
       - name: 'Get version'
         run: |
           VERSION=$(python setup.py --version)-dev
