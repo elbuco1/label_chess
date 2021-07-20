@@ -77,7 +77,18 @@ jobs:
     needs: Build
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-    steps:      
+    steps:  
+      - uses: actions/checkout@v2
+        - name: Set up Python 3.x
+          uses: actions/setup-python@v2
+          with:
+            python-version: '3.7'
+            architecture: 'x64'    
+      - name: 'Get version'
+        run: |
+          VERSION=$(python setup.py --version)-dev
+          echo "version=$VERSION" >> $GITHUB_ENV
+
       - name: 'Download app artefact'
         uses: actions/download-artifact@v2
         with:
@@ -86,6 +97,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./label_chess-*-dev        
-          tag_name: v${{ github.run_number }}
-          name: Release V${{ github.run_number }}
+          tag_name: ${{ env.version }}
+          name: Pre-release ${{ env.version }}
           prerelease: True
