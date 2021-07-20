@@ -10,7 +10,7 @@ DESCRIPTION = 'Desktop app to annotate chessgames'
 URL = 'https://github.com/elbuco1/label_chess'
 EMAIL = 'lrtboucaud@gmail.com'
 AUTHOR = "Laurent Boucaud"
-REQUIRES_PYTHON = '>=3.9,<3.10'
+REQUIRES_PYTHON = '>=3.7,<3.10'
 
 
 def list_reqs(fname='requirements.txt'):
