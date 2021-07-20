@@ -3,7 +3,7 @@ name: Push on main
 on:
   push:
     branches:
-      - main_test
+      - main
 
 jobs:
   Build:
