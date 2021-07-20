@@ -55,7 +55,7 @@ jobs:
           architecture: 'x64'
       - name: Install dependencies
         run: |
-          apt-get install python3-pip
+          sudo apt-get install python3-pip
           python3 -m venv build_exe
           source build_exe/bin/activate
           python3 -m pip install --upgrade pip pyinstaller wheel setuptools
