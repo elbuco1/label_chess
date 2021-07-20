@@ -25,6 +25,7 @@ jobs:
           
       - name: Build dist
         run: |
+          source build_exe/bin/activate
           CURRENT_VERSION=$(python setup.py --version)
           SITES_PACKAGE_PATH=build_exe/lib/python3.7/site-packages
           bash pyinstaller.sh $SITES_PACKAGE_PATH $CURRENT_VERSION-dev
