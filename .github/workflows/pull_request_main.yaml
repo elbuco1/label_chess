@@ -64,3 +64,9 @@ jobs:
           CURRENT_VERSION=$(python setup.py --version)
           SITES_PACKAGE_PATH=build_exe/lib/python3.7/site-packages
           bash pyinstaller.sh $SITES_PACKAGE_PATH $CURRENT_VERSION-dev
+
+      - name: 'Upload .exe'
+        uses: actions/upload-artifact@v2
+        with:
+          name: label_chess.exe
+          path: ./dist/label_chess-*-dev
