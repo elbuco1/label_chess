@@ -6,6 +6,7 @@
 ####### same on main
 
 # TODO review aspect of add video/pgn and export subwindows
+# TODO readme
 
 # TODO when copy-pasting video or pgn, rename with name in database to avoid overwriting existing video
 # TODO logs
