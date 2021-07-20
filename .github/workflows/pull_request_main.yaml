@@ -44,7 +44,7 @@ jobs:
           python check_version_increase.py  version_increased --former_version $FORMER_VERSION --current_version $CURRENT_VERSION
 
   Build:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: Test
     steps:
       - uses: actions/checkout@v2
