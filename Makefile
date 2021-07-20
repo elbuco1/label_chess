@@ -9,7 +9,7 @@ PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 # PROFILE = default
 PROJECT_NAME = label_chess
 PYTHON_INTERPRETER = python3
-PACKAGE_NAME =  chlabel
+PACKAGE_NAME =  app
 
 ifeq (,$(shell which conda))
 HAS_CONDA=False
