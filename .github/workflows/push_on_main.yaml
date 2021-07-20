@@ -15,17 +15,12 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
-      - name: Install dependencies
         run: |
           sudo apt-get install python3-pip
           python3 -m venv build_exe
           source build_exe/bin/activate
           python3 -m pip install --upgrade pip pyinstaller wheel setuptools
           python3 -m pip install .
-          
-      - name: Build dist
-        run: |
-          source build_exe/bin/activate
           CURRENT_VERSION=$(python setup.py --version)
           SITES_PACKAGE_PATH=build_exe/lib/python3.7/site-packages
           bash pyinstaller.sh $SITES_PACKAGE_PATH $CURRENT_VERSION-dev
