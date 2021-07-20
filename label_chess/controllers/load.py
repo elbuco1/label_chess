@@ -4,7 +4,6 @@
 import os
 import shutil
 
-import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 
@@ -68,7 +67,7 @@ class LoaderController(Controller):
             text=os.path.split(self.path)[-1])
 
     def add_db(self):
-        """Add a file to the database based on the 
+        """Add a file to the database based on the
         path selected in select.
         """
         # check a file is selected

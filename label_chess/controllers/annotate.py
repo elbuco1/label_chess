@@ -3,7 +3,6 @@
 
 from PIL import Image
 import os
-import pathlib
 import shutil
 import pandas as pd
 
@@ -108,7 +107,6 @@ class ChessFenAnnotatorController(Controller):
         self.bottom_right_x = 100
         self.bottom_right_y = 100
 
-
         # init variables to keep track of
         # annotations
         self.setup_variables()
@@ -137,10 +135,11 @@ class ChessFenAnnotatorController(Controller):
         # get subframe
         video_frame = self.view.frames["video"]
         # load available videos from db to option menu
-        video_frame.buttons["select_video"].bind('<Button-1>',
-                                                 lambda event: self.populate_menu_buttons(
-                                                     query=models.Video.name,
-                                                     update_func=video_frame.update_video_list))
+        video_frame.buttons["select_video"].bind(
+            '<Button-1>',
+            lambda event: self.populate_menu_buttons(
+                query=models.Video.name,
+                update_func=video_frame.update_video_list))
         # bind frame navigation buttons to methods
         video_frame.buttons["next_frame"].configure(
             command=self.get_next_frame)
@@ -215,14 +214,13 @@ class ChessFenAnnotatorController(Controller):
         """
         sliders = self.view.frames["video"].buttons
         sliders["slider_left"].configure(
-            command=self.update_bbox )
+            command=self.update_bbox)
         sliders["slider_right"].configure(
-            command=self.update_bbox )
+            command=self.update_bbox)
         sliders["slider_top"].configure(
-            command=self.update_bbox )
+            command=self.update_bbox)
         sliders["slider_bottom"].configure(
-            command=self.update_bbox )
-    
+            command=self.update_bbox)
 
     def setup_keyboard_shortcuts(self):
         """ Bind keyboard to app's buttons
@@ -232,7 +230,7 @@ class ChessFenAnnotatorController(Controller):
 
         # bind image navigation buttons to keyboad
         self.view.master.bind('<Left>',
-                              lambda event: video_btns["previous_frame"].invoke())  # .flash
+                              lambda event: video_btns["previous_frame"].invoke())
         self.view.master.bind('<Right>',
                               lambda event: video_btns["next_frame"].invoke())
         self.view.master.bind('<Up>',
@@ -419,9 +417,9 @@ class ChessFenAnnotatorController(Controller):
             row = [frame, fen, *bbox]
             rows.append(row)
         df = pd.DataFrame(rows, columns=[
-                "frame_id", "fen", "top_left_x", "top_left_y",
-                "bottom_right_x", "bottom_right_y"
-            ])
+            "frame_id", "fen", "top_left_x", "top_left_y",
+            "bottom_right_x", "bottom_right_y"
+        ])
 
         # Get the list of annotations already in the database
         db = models.get_db()
@@ -548,7 +546,6 @@ class ChessFenAnnotatorController(Controller):
         self.current_frame -= 1
         self.get_next_frame()
 
-
     def get_next_frame(self, event=None):
         """Get next frame from generator and save it to self.frames
         then replace the current frame with the new frame.
@@ -598,8 +595,8 @@ class ChessFenAnnotatorController(Controller):
         self.last_saved_frame.append(self.current_frame)
         self.last_saved_fen.append(self.current_fen)
         self.last_bbox.append(
-            [ self.top_left_x, self.top_left_y,
-            self.bottom_right_x, self.bottom_right_y])
+            [self.top_left_x, self.top_left_y,
+             self.bottom_right_x, self.bottom_right_y])
 
         self.get_next_frame()
         self.get_next_fen()
@@ -673,8 +670,6 @@ class ChessFenAnnotatorController(Controller):
         self.setup_variables()
         self.bind_view(self.view)
 
-
-
     def update_states(self, caller):
         """Activation/Deactivation of components. To change state
         of components, methods should call this method. This allows
@@ -692,7 +687,6 @@ class ChessFenAnnotatorController(Controller):
             self.view.frames["video"].activate_button("slider_right")
             self.view.frames["video"].activate_button("slider_top")
             self.view.frames["video"].activate_button("slider_bottom")
-
 
         elif caller == "end_annotation":
             self.view.activate_button("start_button")

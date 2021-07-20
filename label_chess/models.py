@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String, \
-    ForeignKey, Table
+    ForeignKey
 
 ROOT = pathlib.Path.home()
 DB_DATA_DIR = os.path.join(ROOT, "label_chess_database")
@@ -53,7 +53,7 @@ def get_db():
 
 
 def todict(obj):
-    """ Return the object's dict excluding private attributes, 
+    """ Return the object's dict excluding private attributes,
     sqlalchemy state and relationship attributes.
     """
     excl = ('_sa_adapter', '_sa_instance_state')

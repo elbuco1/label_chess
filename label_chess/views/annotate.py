@@ -168,9 +168,10 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         # select pgn
         self.string_vars["select_pgn"] = tk.StringVar(self.select_frm)
         self.string_vars["select_pgn"].set(self.default_select_option)
-        self.buttons["select_pgn"] = tk.OptionMenu(master=self.select_frm,
-                                                   variable=self.string_vars["select_pgn"],
-                                                   value=self.default_select_option)
+        self.buttons["select_pgn"] = tk.OptionMenu(
+            master=self.select_frm,
+            variable=self.string_vars["select_pgn"],
+            value=self.default_select_option)
         self.buttons["select_pgn"].grid(row=0, column=1, sticky="nsew")
 
         # second row label
@@ -321,9 +322,10 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         # select video
         self.string_vars["select_video"] = tk.StringVar(self.selection_frm)
         self.string_vars["select_video"].set(self.default_video_option)
-        self.buttons["select_video"] = tk.OptionMenu(master=self.selection_frm,
-                                                     variable=self.string_vars["select_video"],
-                                                     value=self.default_video_option)
+        self.buttons["select_video"] = tk.OptionMenu(
+            master=self.selection_frm,
+            variable=self.string_vars["select_video"],
+            value=self.default_video_option)
         self.buttons["select_video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
@@ -335,7 +337,6 @@ class VideoFrame(tk.Frame, ButtonsMixin):
                                                   self.string_vars["fps_ratio"],
                                                   *fps_options)
         self.buttons["fps_ratio"].grid(row=0, column=2, sticky="nsew")
-    
 
     def create_frame_sliders(self, master):
         """Frame containing img from chess game video and
@@ -343,13 +344,13 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         """
         # container for img + sliders
         self.frm_img = tk.Frame(master=master)
-        self.frm_img.rowconfigure([0,1,2], weight=1)
+        self.frm_img.rowconfigure([0, 1, 2], weight=1)
         self.frm_img.columnconfigure(0, weight=1)
         self.frm_img.grid(row=1, column=0, sticky="nsew")
 
         # sub container for image and right side vertical sliders
         self.frm_img_right_slider = tk.Frame(master=self.frm_img)
-        self.frm_img_right_slider.columnconfigure([0,1,2], weight=1)
+        self.frm_img_right_slider.columnconfigure([0, 1, 2], weight=1)
         self.frm_img_right_slider.rowconfigure(0, weight=1)
 
         self.frm_img_right_slider.grid(row=1, column=0, sticky="nsew")
@@ -363,27 +364,26 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         # side sliders
         self.buttons["slider_left"] = tk.Scale(
             master=self.frm_img_right_slider,
-            from_= 0,
+            from_=0,
             to=100,
-            width = 10,
+            width=10,
             showvalue=False,
             sliderlength=10
-            )
+        )
         self.buttons["slider_left"].set(0)
         self.buttons["slider_left"].grid(row=0, column=0, sticky="nsew")
         self.disable_button("slider_left")
 
-
         self.buttons["slider_right"] = tk.Scale(
             master=self.frm_img_right_slider,
-            from_= 0,
+            from_=0,
             to=100,
-            width = 10,
+            width=10,
             showvalue=False,
             sliderlength=10
-            )
+        )
         self.buttons["slider_right"].set(100)
-        self.buttons["slider_right"].grid(row=0, column=2, sticky= "nsew")
+        self.buttons["slider_right"].grid(row=0, column=2, sticky="nsew")
         self.disable_button("slider_right")
 
         # align top and bottom sliders to image width
@@ -394,31 +394,32 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         # bottom sliders
         self.buttons["slider_top"] = tk.Scale(
             master=self.frm_img,
-            from_= 0,
+            from_=0,
             to=100,
-            width = 10,
+            width=10,
             orient=tk.HORIZONTAL,
             showvalue=False,
             sliderlength=10
-            )
+        )
         self.buttons["slider_top"].set(0)
-        self.buttons["slider_top"].grid(row=0, column=0, sticky="nsew", padx=padding)
+        self.buttons["slider_top"].grid(
+            row=0, column=0, sticky="nsew", padx=padding)
 
         self.disable_button("slider_top")
 
         self.buttons["slider_bottom"] = tk.Scale(
             master=self.frm_img,
-            from_= 0,
+            from_=0,
             to=100,
-            width = 10,
+            width=10,
             orient=tk.HORIZONTAL,
             showvalue=False,
             sliderlength=10
-            )
+        )
         self.buttons["slider_bottom"].set(100)
-        self.buttons["slider_bottom"].grid(row=2, column=0, sticky="nsew", padx=padding)
+        self.buttons["slider_bottom"].grid(
+            row=2, column=0, sticky="nsew", padx=padding)
         self.disable_button("slider_bottom")
-
 
     def create_navigation_buttons(self, master):
         """Frame containing buttons to navigate
@@ -480,9 +481,9 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.labels["frame"].configure(image=image)
         self.labels["frame"].image = image
 
-    def set_image(self, image, 
-            top_left=None,
-            bottom_right=None):
+    def set_image(self, image,
+                  top_left=None,
+                  bottom_right=None):
         """Take a PIL image and save it
         as an attribute of the frame.
         Resize the image to img_prop * height.
@@ -510,18 +511,18 @@ class VideoFrame(tk.Frame, ButtonsMixin):
             draw = ImageDraw.Draw(image)
             width, height = image.size
 
-            top_left = tuple([ 
+            top_left = tuple([
                 int(top_left[0] * width / 100),
                 int(top_left[1] * height / 100)
             ])
 
-            bottom_right = tuple([ 
-                int(bottom_right[0] * width / 100) -1,
+            bottom_right = tuple([
+                int(bottom_right[0] * width / 100) - 1,
                 int(bottom_right[1] * height / 100)-1
             ])
 
-            draw.rectangle([top_left, bottom_right], 
-                outline = "red", width=3)
+            draw.rectangle([top_left, bottom_right],
+                           outline="red", width=3)
         self.display_image(image)
 
     def update_video_list(self, options):

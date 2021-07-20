@@ -51,7 +51,6 @@ def get_game_board_images(pgn_path, board_size=480):
     return images
 
 
-
 # if __name__ == "__main__":
 #     pieces_path = "resources/pieces"
 #     pgn_path = "data/raw/kramnik_carlsen_salman2019"

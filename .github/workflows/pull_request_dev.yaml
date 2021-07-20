@@ -32,7 +32,7 @@ jobs:
           pip install -r requirements.txt
       - name: Lint with flake8
         run: |
-          flake8 ./label_chess/* --max-line-length=90 --exclude=tests/*,label_chess/VERSION,label_chess/__init__.py
+          flake8 ./label_chess/* --max-line-length=90 --exclude=tests/*,label_chess/VERSION,label_chess/__init__.py,label_chess/controllers/__init__.py,label_chess/views/__init__.py
       - name: Test with pytest
         run: |
           pytest -vvv tests/* --cov=label_chess
