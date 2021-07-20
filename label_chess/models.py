@@ -11,20 +11,19 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String, \
     ForeignKey, Table
 
+ROOT = pathlib.Path.home()
+DB_DATA_DIR = os.path.join(ROOT, "label_chess_database")
+VIDEO_DATA_DIR = os.path.join(DB_DATA_DIR, "video")
+PGN_DATA_DIR = os.path.join(DB_DATA_DIR, "pgn")
+ANNOTATIONS_DATA_DIR = os.path.join(DB_DATA_DIR, "annotations")
 
-DB_PATH = "sqlite:///db.sqlite"
+DB_PATH = f"sqlite:///{DB_DATA_DIR}/db.sqlite"
 ENGINE = create_engine(url=DB_PATH)
 SESSION = sessionmaker(bind=ENGINE)
 BASE = declarative_base(bind=ENGINE)
 
 # create one directory per type in the database
 # artefacts are copied/saved to this directories
-
-ROOT = pathlib.Path.home()
-DB_DATA_DIR = os.path.join(ROOT, "label_chess_database")
-VIDEO_DATA_DIR = os.path.join(DB_DATA_DIR, "video")
-PGN_DATA_DIR = os.path.join(DB_DATA_DIR, "pgn")
-ANNOTATIONS_DATA_DIR = os.path.join(DB_DATA_DIR, "annotations")
 
 
 def init_db(clear=False):
