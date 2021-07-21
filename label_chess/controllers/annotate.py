@@ -441,8 +441,8 @@ class ChessFenAnnotatorController(Controller):
 
             if csv_name is None:
                 messagebox.showwarning("Annotation",
-                                   "Didn't save annotation.",
-                                   parent=self.view)
+                                       "Didn't save annotation.",
+                                       parent=self.view)
                 return
             csv_path = os.path.join(models.ANNOTATIONS_DATA_DIR,
                                     f"{csv_name}.csv")
@@ -469,7 +469,7 @@ class ChessFenAnnotatorController(Controller):
 
         messagebox.showinfo("Annotation",
                             "Successfully saved annotation.",
-                                   parent=self.view)
+                            parent=self.view)
         self.reset_app()
 
     def export_annotation(self):
@@ -533,8 +533,7 @@ class ChessFenAnnotatorController(Controller):
         messagebox.showinfo("Export annotation",
                             "Annotation successfully exported "
                             f"to {export_dir}",
-                                   parent=self.view)
-
+                            parent=self.view)
 
     def reset_database(self):
         models.init_db(clear=True)

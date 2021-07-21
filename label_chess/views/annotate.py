@@ -101,7 +101,8 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
 
         self.buttons["reset_button"] = tk.Button(
             self.bottom_btns, text="RESET DB", **cfg.BTN())
-        self.buttons["reset_button"].grid(row=0, column=4, sticky="nsew") # disable when annotating
+        self.buttons["reset_button"].grid(
+            row=0, column=4, sticky="nsew")  # disable when annotating
 
     def config_window(self):
         """Configure Parent window and frame.
@@ -154,7 +155,8 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         * third row contains one button (skip to the next image)
         """
         # Main container
-        self.container = tk.LabelFrame(master=self, text="Moves", **cfg.LBL_FRM())
+        self.container = tk.LabelFrame(
+            master=self, text="Moves", **cfg.LBL_FRM())
         self.container.rowconfigure([0, 2],  weight=1)
         self.container.rowconfigure(1,  weight=2)
         self.container.columnconfigure(0,  weight=1)
@@ -241,9 +243,8 @@ class PGNFrame(tk.Frame, ButtonsMixin):
 
         for option in options:
             menu.add_command(label=option,
-                                command=lambda value=option[:self.max_chars_pgn_list]:
-                                self.string_vars["select_pgn"].set(value))
-            
+                             command=lambda value=option[:self.max_chars_pgn_list]:
+                             self.string_vars["select_pgn"].set(value))
 
     def get_selected_pgn(self):
         """Get the value currently selected in the
@@ -300,7 +301,8 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         """Display frame's widgets
         """
         # Main container
-        self.container = tk.LabelFrame(master=self, text="Frames", **cfg.LBL_FRM())
+        self.container = tk.LabelFrame(
+            master=self, text="Frames", **cfg.LBL_FRM())
         self.container.rowconfigure([0, 2],  weight=1)
         self.container.rowconfigure(1,  weight=2)
 
@@ -557,8 +559,8 @@ class VideoFrame(tk.Frame, ButtonsMixin):
 
         for option in options:
             menu.add_command(label=option,
-                                command=lambda value=option:
-                                self.string_vars["select_video"].set(value))
+                             command=lambda value=option:
+                             self.string_vars["select_video"].set(value))
 
     def get_selected_video(self):
         """Get the value currently selected in the

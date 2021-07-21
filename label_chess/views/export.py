@@ -27,16 +27,17 @@ class ExportDialog(simpledialog.Dialog):
         super().__init__(parent, title)
 
     def body(self, frame):
-        
+
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(0, weight=1)
 
-        self.container = tk.LabelFrame(master=frame, text="Annotations", **cfg.LBL_FRM())
+        self.container = tk.LabelFrame(
+            master=frame, text="Annotations", **cfg.LBL_FRM())
         self.container.grid(row=0, column=0, sticky="nsew")
 
         self.container.columnconfigure(0, weight=1)
         self.container.rowconfigure(
-            [i for i,_ in enumerate(self.options)], 
+            [i for i, _ in enumerate(self.options)],
             weight=1)
 
         # one checkbox per option
@@ -45,7 +46,6 @@ class ExportDialog(simpledialog.Dialog):
             self.check_boxes[option] = tk.Checkbutton(self.container, text=option,
                                                       variable=self.vars[option])
             self.check_boxes[option].grid(row=i, column=0, sticky="nsew")
-
 
         return frame
 
@@ -58,11 +58,11 @@ class ExportDialog(simpledialog.Dialog):
 
     def buttonbox(self):
         self.ok_button = tk.Button(
-            self, text='Export', width=5, command=self.ok_pressed, 
+            self, text='Export', width=5, command=self.ok_pressed,
             **cfg.BTN())
         self.ok_button.pack(side="left")
         cancel_button = tk.Button(
-            self, text='Cancel', width=5, command=self.cancel_pressed, 
+            self, text='Cancel', width=5, command=self.cancel_pressed,
             **cfg.BTN())
         cancel_button.pack(side="right")
         self.bind("<Return>", lambda event: self.ok_pressed())
