@@ -325,20 +325,23 @@ class ChessFenAnnotatorController(Controller):
         video_name = video_frame.get_selected_video()
         if video_name == "":
             messagebox.showwarning("No video selected",
-                                   "Please select a video.")
+                                   "Please select a video.",
+                                   parent=self.view)
             return
 
         # get selected fps ration (only 1/fps_ratio frame is displayed)
         fps_ratio = video_frame.get_selected_fps_ratio()
         if fps_ratio == -1:
             messagebox.showwarning("No fps ratio selected",
-                                   "Please select a fps ratio.")
+                                   "Please select a fps ratio.",
+                                   parent=self.view)
             return
         # get selected pgn name
         pgn_name = pgn_frame.get_selected_pgn()
         if pgn_name == "":
             messagebox.showwarning("No pgn selected",
-                                   "Please select a pgn file.")
+                                   "Please select a pgn file.",
+                                   parent=self.view)
             return
 
         # load video and pgn to front end
@@ -434,7 +437,13 @@ class ChessFenAnnotatorController(Controller):
         # file.
         while True:
             csv_name = simpledialog.askstring(
-                "Name", "Enter annotation name:", parent=self.view)
+                "Annotation Name", "Enter annotation name:", parent=self.view)
+
+            if csv_name is None:
+                messagebox.showwarning("Annotation",
+                                   "Didn't save annotation.",
+                                   parent=self.view)
+                return
             csv_path = os.path.join(models.ANNOTATIONS_DATA_DIR,
                                     f"{csv_name}.csv")
             if csv_path not in csv_files:
@@ -455,10 +464,12 @@ class ChessFenAnnotatorController(Controller):
         except Exception:
             traceback.print_exc()
             messagebox.showwarning("Annotation",
-                                   "Couldn't save annotation.")
+                                   "Couldn't save annotation.",
+                                   parent=self.view)
 
         messagebox.showinfo("Annotation",
-                            "Successfully saved annotation.")
+                            "Successfully saved annotation.",
+                                   parent=self.view)
         self.reset_app()
 
     def export_annotation(self):
@@ -480,7 +491,7 @@ class ChessFenAnnotatorController(Controller):
 
         # open a dialog to ask the user for a directory where
         # to export the annotations.
-        export_dir = filedialog.askdirectory()
+        export_dir = filedialog.askdirectory(parent=self.view)
         if not export_dir:
             return
 
@@ -517,10 +528,12 @@ class ChessFenAnnotatorController(Controller):
         except Exception:
             traceback.print_exc()
             messagebox.showwarning("Export annotation",
-                                   "Couldn't export annotation.")
+                                   "Couldn't export annotation.",
+                                   parent=self.view)
         messagebox.showinfo("Export annotation",
                             "Annotation successfully exported "
-                            f"to {export_dir}")
+                            f"to {export_dir}",
+                                   parent=self.view)
 
 
     def reset_database(self):

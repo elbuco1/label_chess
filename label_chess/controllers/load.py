@@ -58,6 +58,7 @@ class LoaderController(Controller):
         then display the selected path in a label on the view.
         """
         self.path = filedialog.askopenfilename(
+            parent=self.view,
             filetypes=[self.file_type]
         )
         if not self.path:
@@ -73,7 +74,8 @@ class LoaderController(Controller):
         # check a file is selected
         if not self.path:
             messagebox.showwarning(
-                f"Please select a {self.add_name} on your computer")
+                f"Please select a {self.add_name} on your computer",
+                parent=self.view)
             return
 
         # url is optional. if not sets, defaults to the
@@ -90,7 +92,8 @@ class LoaderController(Controller):
         if self.exists_in_db(url, name):
             messagebox.showwarning("Already exists",
                                    f"{self.add_name} "
-                                   "already exists in database")
+                                   "already exists in database",
+                                   parent=self.view)
             return
 
         db_path = os.path.join(self.db_dir,
@@ -108,7 +111,8 @@ class LoaderController(Controller):
                      db_path=db_path)
 
         messagebox.showinfo(f"{self.add_name}",
-                            f"{self.add_name} successfully added to database.")
+                            f"{self.add_name} successfully added to database.",
+                            parent=self.view)
 
         # empty entry and label widgets
         self.view.entries["URL"].delete(0, 'end')

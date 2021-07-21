@@ -1,4 +1,4 @@
-# TODO clean gui (front windows)
+# TODO center end annotation and exportdialog
 # TODO clean gui (design/relief/colors)
 
 # TODO Readme

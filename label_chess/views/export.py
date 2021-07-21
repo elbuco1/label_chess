@@ -4,7 +4,6 @@
 import tkinter as tk
 from tkinter import simpledialog
 
-
 class ExportDialog(simpledialog.Dialog):
     def __init__(self, parent, title, options):
         """Custom simple dialog. Display a set
@@ -26,15 +25,25 @@ class ExportDialog(simpledialog.Dialog):
         super().__init__(parent, title)
 
     def body(self, frame):
+        
+        frame.columnconfigure(0, weight=1)
+        frame.rowconfigure(0, weight=1)
+
         self.container = tk.LabelFrame(master=frame, text="Annotations")
-        self.container.pack(fill=tk.BOTH)
+        self.container.grid(row=0, column=0, sticky="nsew")
+
+        self.container.columnconfigure(0, weight=1)
+        self.container.rowconfigure(
+            [i for i,_ in enumerate(self.options)], 
+            weight=1)
 
         # one checkbox per option
-        for option in self.options:
+        for i, option in enumerate(self.options):
             self.vars[option] = tk.IntVar()
             self.check_boxes[option] = tk.Checkbutton(self.container, text=option,
                                                       variable=self.vars[option])
-            self.check_boxes[option].pack(fill=tk.BOTH)
+            self.check_boxes[option].grid(row=i, column=0, sticky="nsew")
+
 
         return frame
 
