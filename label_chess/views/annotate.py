@@ -7,6 +7,7 @@ import tkinter as tk
 
 from label_chess.base import View, ButtonsMixin
 from label_chess import utils
+from label_chess.views import config as cfg
 
 from fen2pil import draw
 
@@ -81,25 +82,25 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         self.bottom_btns.grid(row=1, column=0, sticky="nsew")
 
         self.buttons["start_button"] = tk.Button(
-            self.bottom_btns, text="START")
+            self.bottom_btns, text="START", **cfg.BTN())
         self.buttons["start_button"].grid(row=0, column=0, sticky="nsew")
 
         self.buttons["end_button"] = tk.Button(
-            self.bottom_btns, text="END")
+            self.bottom_btns, text="END", **cfg.BTN())
         self.buttons["end_button"].grid(row=0, column=1, sticky="nsew")
         self.disable_button("end_button")
 
         self.buttons["cancel_button"] = tk.Button(
-            self.bottom_btns, text="CANCEL")
+            self.bottom_btns, text="CANCEL", **cfg.BTN())
         self.buttons["cancel_button"].grid(row=0, column=2, sticky="nsew")
         self.disable_button("cancel_button")
 
         self.buttons["export_button"] = tk.Button(
-            self.bottom_btns, text="EXPORT")
+            self.bottom_btns, text="EXPORT", **cfg.BTN())
         self.buttons["export_button"].grid(row=0, column=3, sticky="nsew")
 
         self.buttons["reset_button"] = tk.Button(
-            self.bottom_btns, text="RESET_DB")
+            self.bottom_btns, text="RESET DB", **cfg.BTN())
         self.buttons["reset_button"].grid(row=0, column=4, sticky="nsew") # disable when annotating
 
     def config_window(self):
@@ -153,7 +154,7 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         * third row contains one button (skip to the next image)
         """
         # Main container
-        self.container = tk.LabelFrame(master=self, text="Moves")
+        self.container = tk.LabelFrame(master=self, text="Moves", **cfg.LBL_FRM())
         self.container.rowconfigure([0, 2],  weight=1)
         self.container.rowconfigure(1,  weight=2)
         self.container.columnconfigure(0,  weight=1)
@@ -167,7 +168,7 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         self.select_frm.grid(row=0, column=0, sticky="nsew")
         # add pgn
         self.buttons["add_pgn"] = tk.Button(
-            master=self.select_frm, text="Add pgn")
+            master=self.select_frm, text="Add pgn", **cfg.BTN())
         self.buttons["add_pgn"].grid(row=0, column=0, sticky="nsew")
         # select pgn
         self.string_vars["select_pgn"] = tk.StringVar(self.select_frm)
@@ -176,6 +177,9 @@ class PGNFrame(tk.Frame, ButtonsMixin):
             master=self.select_frm,
             variable=self.string_vars["select_pgn"],
             value=self.default_select_option)
+        self.buttons["select_pgn"].config(**cfg.BTN())
+        self.buttons["select_pgn"]["menu"].config(**cfg.BTN())
+
         self.buttons["select_pgn"].grid(row=0, column=1, sticky="nsew")
 
         # second row label
@@ -188,7 +192,7 @@ class PGNFrame(tk.Frame, ButtonsMixin):
         self.buttons["skip_fen"] = tk.Button(
             master=self.container,
             text="Skip(Space)",
-            state="disabled")
+            state="disabled", **cfg.BTN())
         self.buttons["skip_fen"].grid(row=2, column=0, sticky="nsew")
 
     def config_window(self):
@@ -296,7 +300,7 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         """Display frame's widgets
         """
         # Main container
-        self.container = tk.LabelFrame(master=self, text="Frames")
+        self.container = tk.LabelFrame(master=self, text="Frames", **cfg.LBL_FRM())
         self.container.rowconfigure([0, 2],  weight=1)
         self.container.rowconfigure(1,  weight=2)
 
@@ -324,7 +328,7 @@ class VideoFrame(tk.Frame, ButtonsMixin):
 
         # add video
         self.buttons["add_video"] = tk.Button(
-            master=self.selection_frm, text="Add video")
+            master=self.selection_frm, text="Add video", **cfg.BTN())
         self.buttons["add_video"].grid(row=0, column=0, sticky="nsew")
 
         # select video
@@ -334,6 +338,8 @@ class VideoFrame(tk.Frame, ButtonsMixin):
             master=self.selection_frm,
             variable=self.string_vars["select_video"],
             value=self.default_video_option)
+        self.buttons["select_video"].config(**cfg.BTN())
+        self.buttons["select_video"]["menu"].config(**cfg.BTN())
         self.buttons["select_video"].grid(row=0, column=1, sticky="nsew")
 
         # select fps
@@ -344,6 +350,8 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.buttons["fps_ratio"] = tk.OptionMenu(self.selection_frm,
                                                   self.string_vars["fps_ratio"],
                                                   *fps_options)
+        self.buttons["fps_ratio"].config(**cfg.BTN())
+        self.buttons["fps_ratio"]["menu"].config(**cfg.BTN())
         self.buttons["fps_ratio"].grid(row=0, column=2, sticky="nsew")
 
     def create_frame_sliders(self, master):
@@ -444,28 +452,28 @@ class VideoFrame(tk.Frame, ButtonsMixin):
         self.buttons["previous_frame"] = tk.Button(
             master=self.frm_images_buttons,
             text="Previous(Left)",
-            state="disabled")
+            state="disabled", **cfg.BTN())
         self.buttons["previous_frame"].grid(row=0, column=0, sticky="nsew")
 
         # save frame button
         self.buttons["save_frame"] = tk.Button(
             master=self.frm_images_buttons,
             text="Save(Up)",
-            state="disabled")
+            state="disabled", **cfg.BTN())
         self.buttons["save_frame"].grid(row=0, column=1, sticky="nsew")
 
         # unsave frame button
         self.buttons["unsave_frame"] = tk.Button(
             master=self.frm_images_buttons,
             text="Unsave(Down)",
-            state="disabled")
+            state="disabled", **cfg.BTN())
         self.buttons["unsave_frame"].grid(row=0, column=3, sticky="nsew")
 
         # next button
         self.buttons["next_frame"] = tk.Button(
             master=self.frm_images_buttons,
             text="Next(Right)",
-            state="disabled")
+            state="disabled", **cfg.BTN())
         self.buttons["next_frame"].grid(row=0, column=4, sticky="nsew")
 
         # label to display popup when frame is saves

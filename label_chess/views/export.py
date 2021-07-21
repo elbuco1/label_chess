@@ -3,6 +3,8 @@
 
 import tkinter as tk
 from tkinter import simpledialog
+from label_chess.views import config as cfg
+
 
 class ExportDialog(simpledialog.Dialog):
     def __init__(self, parent, title, options):
@@ -29,7 +31,7 @@ class ExportDialog(simpledialog.Dialog):
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(0, weight=1)
 
-        self.container = tk.LabelFrame(master=frame, text="Annotations")
+        self.container = tk.LabelFrame(master=frame, text="Annotations", **cfg.LBL_FRM())
         self.container.grid(row=0, column=0, sticky="nsew")
 
         self.container.columnconfigure(0, weight=1)
@@ -56,10 +58,12 @@ class ExportDialog(simpledialog.Dialog):
 
     def buttonbox(self):
         self.ok_button = tk.Button(
-            self, text='Export', width=5, command=self.ok_pressed)
+            self, text='Export', width=5, command=self.ok_pressed, 
+            **cfg.BTN())
         self.ok_button.pack(side="left")
         cancel_button = tk.Button(
-            self, text='Cancel', width=5, command=self.cancel_pressed)
+            self, text='Cancel', width=5, command=self.cancel_pressed, 
+            **cfg.BTN())
         cancel_button.pack(side="right")
         self.bind("<Return>", lambda event: self.ok_pressed())
         self.bind("<Escape>", lambda event: self.cancel_pressed())

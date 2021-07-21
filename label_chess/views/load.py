@@ -4,6 +4,7 @@
 import tkinter as tk
 
 from label_chess.base import View
+from label_chess.views import config as cfg
 
 
 class LoaderView(View):
@@ -46,7 +47,7 @@ class LoaderView(View):
         """
         select_key = f"select_{self.add_name}"
         self.buttons[select_key] = tk.Button(
-            self, text=f"Select {self.add_name}")
+            self, text=f"Select {self.add_name}", **cfg.BTN())
         self.buttons[select_key].grid(row=0, column=0, sticky="nsew")
 
         self.labels[select_key] = tk.Label(self)
@@ -61,11 +62,11 @@ class LoaderView(View):
         self.frm_url.grid(row=2, column=0, sticky="nsew")
 
         # Add button
-        self.buttons["Add"] = tk.Button(self, text="Add")
+        self.buttons["Add"] = tk.Button(self, text="Add", **cfg.BTN())
         self.buttons["Add"].grid(row=3, column=0, sticky="nsew")
 
     def create_label_frame(self, text):
-        frm = tk.LabelFrame(self, text=text)
+        frm = tk.LabelFrame(self, text=text, **cfg.LBL_FRM())
         frm.columnconfigure(0, weight=1)
         frm.rowconfigure(0, weight=1)
         return frm
