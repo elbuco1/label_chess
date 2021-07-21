@@ -1,0 +1,63 @@
+name: Push on main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - name: Build dist
+        run: |
+          sudo apt-get install python3-pip
+          python3 -m venv build_exe
+          source build_exe/bin/activate
+          python3 -m pip install --upgrade pip pyinstaller wheel setuptools
+          python3 -m pip install .
+          CURRENT_VERSION=$(python setup.py --version)
+          SITES_PACKAGE_PATH=build_exe/lib/python3.7/site-packages
+          bash pyinstaller.sh $SITES_PACKAGE_PATH $CURRENT_VERSION
+      
+      - name: 'Upload .exe'
+        uses: actions/upload-artifact@v2
+        with:
+          name: label_chess
+          path: ./dist/label_chess-*
+
+  Release:
+    name: 'Create GitHub Release'
+    runs-on: ubuntu-latest
+    needs: Build
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+    steps:  
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'    
+
+      - name: 'Get version'
+        run: |
+          VERSION=$(python setup.py --version)
+          echo "version=$VERSION" >> $GITHUB_ENV
+
+      - name: 'Download app artefact'
+        uses: actions/download-artifact@v2
+        with:
+          name: label_chess
+      - name: 'Create GitHub Release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./label_chess-*       
+          tag_name: ${{ env.version }}
+          name: Release ${{ env.version }}
