@@ -109,7 +109,7 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         self.master.resizable(False, False)
         self.master.rowconfigure(0,  weight=1)
         self.master.columnconfigure(0, weight=1)
-        self.master.title("Chess video FEN annotator")
+        self.master.title("Label Chess")
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure([0, 1], weight=1)
