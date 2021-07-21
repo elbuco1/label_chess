@@ -207,6 +207,9 @@ class ChessFenAnnotatorController(Controller):
         self.view.buttons["export_button"].configure(
             command=self.export_annotation)
 
+        self.view.buttons["reset_button"].configure(
+            command=self.reset_database)
+
     def bind_bbox_sliders(self):
         """
         Bind sliders to a method that draws bounding
@@ -519,6 +522,10 @@ class ChessFenAnnotatorController(Controller):
                             "Annotation successfully exported "
                             f"to {export_dir}")
 
+
+    def reset_database(self):
+        models.init_db(clear=True)
+
     def get_next_fen(self, event=None):
         """Get the next fen image in the list
         and display it in the gui
@@ -681,6 +688,7 @@ class ChessFenAnnotatorController(Controller):
         """
         if caller == "start_annotation":
             self.view.disable_button("start_button")
+            self.view.disable_button("reset_button")
             self.view.activate_button("cancel_button")
             self.view.activate_button("end_button")
             self.view.frames["video"].activate_button("slider_left")
@@ -690,6 +698,7 @@ class ChessFenAnnotatorController(Controller):
 
         elif caller == "end_annotation":
             self.view.activate_button("start_button")
+            self.view.activate_button("reset_button")
             self.view.disable_button("cancel_button")
             self.view.disable_button("end_button")
             self.view.frames["video"].disable_button("slider_left")

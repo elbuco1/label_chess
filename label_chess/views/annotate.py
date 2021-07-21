@@ -77,7 +77,7 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         """
         self.bottom_btns = tk.Frame(master=self)
         self.bottom_btns.rowconfigure(0,  weight=1)
-        self.bottom_btns.columnconfigure([0, 1, 2, 3], weight=1)
+        self.bottom_btns.columnconfigure([0, 1, 2, 3, 4], weight=1)
         self.bottom_btns.grid(row=1, column=0, sticky="nsew")
 
         self.buttons["start_button"] = tk.Button(
@@ -97,6 +97,10 @@ class ChessFenAnnotatorView(View, ButtonsMixin):
         self.buttons["export_button"] = tk.Button(
             self.bottom_btns, text="EXPORT")
         self.buttons["export_button"].grid(row=0, column=3, sticky="nsew")
+
+        self.buttons["reset_button"] = tk.Button(
+            self.bottom_btns, text="RESET_DB")
+        self.buttons["reset_button"].grid(row=0, column=4, sticky="nsew") # disable when annotating
 
     def config_window(self):
         """Configure Parent window and frame.
@@ -225,13 +229,17 @@ class PGNFrame(tk.Frame, ButtonsMixin):
             options (list of str): list of options
                 to display.
         """
-        if len(options) > 0:
-            menu = self.buttons["select_pgn"]["menu"]
-            menu.delete(0, "end")
-            for option in options:
-                menu.add_command(label=option,
-                                 command=lambda value=option[:self.max_chars_pgn_list]:
-                                 self.string_vars["select_pgn"].set(value))
+        menu = self.buttons["select_pgn"]["menu"]
+        menu.delete(0, "end")
+
+        if len(options) == 0:
+            options = ["Select pgn..."]
+
+        for option in options:
+            menu.add_command(label=option,
+                                command=lambda value=option[:self.max_chars_pgn_list]:
+                                self.string_vars["select_pgn"].set(value))
+            
 
     def get_selected_pgn(self):
         """Get the value currently selected in the
@@ -533,13 +541,16 @@ class VideoFrame(tk.Frame, ButtonsMixin):
             options (list of str): list of options
                 to display.
         """
-        if len(options) > 0:
-            menu = self.buttons["select_video"]["menu"]
-            menu.delete(0, "end")
-            for option in options:
-                menu.add_command(label=option,
-                                 command=lambda value=option:
-                                 self.string_vars["select_video"].set(value))
+        menu = self.buttons["select_video"]["menu"]
+        menu.delete(0, "end")
+
+        if len(options) == 0:
+            options = ["Select video..."]
+
+        for option in options:
+            menu.add_command(label=option,
+                                command=lambda value=option:
+                                self.string_vars["select_video"].set(value))
 
     def get_selected_video(self):
         """Get the value currently selected in the
