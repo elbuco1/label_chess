@@ -11,7 +11,9 @@ Aimed at building a dataset to train machine learning models on the task of pred
 
 ### Add files to database
 
-
+<div align='center'>
+<img src="gifs/demo0.gif"></img>
+</div>
 
 * Download the app from the latest available release on github (you may need to give the execution rights to the app file).
 * Download a video of a chess game (i.e. from youtube).
@@ -22,10 +24,12 @@ Aimed at building a dataset to train machine learning models on the task of pred
 
 Note: You can add as many pgn and video files to the app database.
 
+
+
 ### Start an annotation
 
 <div align='center'>
-<img src="demo1.gif"></img>
+<img src="gifs/demo1.gif"></img>
 </div>
 
 * Select a video from the list available videos (i.e. click on the ``Select video...`` button).
@@ -37,7 +41,7 @@ Note: You can add as many pgn and video files to the app database.
 ### Annotation
 
 <div align='center'>
-<img src="demo2.gif"></img>
+<img src="gifs/demo2.gif"></img>
 </div>
 
 * A visual representation of the first position in the pgn file is loaded on the left part of the screen whereas the first frame of the video is loaded on the right part of the screen.
@@ -48,6 +52,13 @@ Note: You can add as many pgn and video files to the app database.
 * You can cancel the last save by pressing the ``Unsave`` button or the ``down arrow`` key.
 * If there is no good frame available for a given position, you can skip the currently displayed position by pressing the ``Skip`` button or the space bar.
 * You can select a part of the frame.
+
+### End annotation
+
+<div align='center'>
+<img src="gifs/demo3.gif"></img>
+</div>
+
 * To cancel the current annotation, click the ``Cancel`` button.
 * Once you are done with the annotation, save it by pressing the ``End`` button. You will be prompted for a name to give your annotation.
 
@@ -55,9 +66,11 @@ Saved annotations are persisted in the app database and can be recovered after s
 
 ### Export annotation
 
+
 <div align='center'>
-<img src="demo3.gif"></img>
-</div>
+<img src="gifs/demo4.gif"></img>
+</div> 
+
 
 You can export one or more annotations by clicking on the ``Export`` button.
 
