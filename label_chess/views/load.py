@@ -67,6 +67,7 @@ class LoaderView(View):
     def create_label_frame(self, text):
         frm = tk.LabelFrame(self, text=text)
         frm.columnconfigure(0, weight=1)
+        frm.rowconfigure(0, weight=1)
         return frm
 
     def config_window(self):

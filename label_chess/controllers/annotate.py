@@ -93,7 +93,7 @@ class ChessFenAnnotatorController(Controller):
 
         # height of the windows to add video/pgn
         # to the database (proportion of the screen)
-        self.add_win_height = 1/7
+        self.add_win_height = 1/6
         # width of the windows to add video/pgn
         # to the database (proportion of the height)
         self.add_win_width = 2
