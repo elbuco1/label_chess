@@ -28,6 +28,7 @@ class ExportDialog(simpledialog.Dialog):
 
     def body(self, frame):
 
+
         self.container = tk.LabelFrame(
             master=frame, text="Annotations", **cfg.LBL_FRM())
         self.container.pack(fill=tk.BOTH)
@@ -38,6 +39,7 @@ class ExportDialog(simpledialog.Dialog):
             self.check_boxes[option] = tk.Checkbutton(self.container, text=option,
                                                       variable=self.vars[option])
             self.check_boxes[option].pack(fill=tk.BOTH)
+
 
         return frame
 

@@ -260,11 +260,13 @@ class ChessFenAnnotatorController(Controller):
         """Init/reset the variables used
         to keep track of the current annotation.
         """
+
         # store the already seen video frame ids
         self.frames = []
         # id of the current video frame
         self.current_frame = -1
         self.previous_frame = -2
+
         # ids of the saved video frames
         self.last_saved_frame = [-1]
         # ids of the saved chess positions
@@ -275,11 +277,13 @@ class ChessFenAnnotatorController(Controller):
         self.current_fen = -1
         # list of tuples (fen string, image of chessboard)
         self.fens = None
+
         # generator of frame ids
         self.frame_generator = None
 
         # video object
         self.video_file = None
+
         # the video and pgn objects used in the current
         # annotation
         self.video, self.pgn = None, None
@@ -369,11 +373,13 @@ class ChessFenAnnotatorController(Controller):
         # find video in db
         self.video = self.get_object_by_name(
             models.Video, video_name)
+
         # load video
         self.video_file = utils.load_video(self.video.path)
         # generate frames
         self.frame_generator = utils.frame_id_generator(
             self.video_file, fps_ratio)
+
         # display frame
         self.get_next_frame()
 
@@ -424,8 +430,10 @@ class ChessFenAnnotatorController(Controller):
             fen = self.fens[fen_id][0]
             # get the frame from the list of frames
             # and get the original frame id (before fps_ratio)
+
             frame = self.frames[frame_id]
             # frame = self.frames[frame_id][0]
+
             row = [frame, fen, *bbox]
             rows.append(row)
         df = pd.DataFrame(rows, columns=[
@@ -536,7 +544,9 @@ class ChessFenAnnotatorController(Controller):
             messagebox.showwarning("Export annotation",
                                    "Couldn't export annotation.",
                                    parent=self.view)
+
             return
+
         messagebox.showinfo("Export annotation",
                             "Annotation successfully exported "
                             f"to {export_dir}",
@@ -551,6 +561,7 @@ class ChessFenAnnotatorController(Controller):
         """
         self.current_fen += 1
 
+
         if self.current_fen < len(self.fens):
             next_fen = self.fens[self.current_fen][-1]
             self.view.frames["pgn"].set_image(next_fen)
@@ -558,6 +569,7 @@ class ChessFenAnnotatorController(Controller):
             messagebox.showwarning("Positions",
                                    "No position (fen) available",
                                    parent=self.view)
+
 
     def load_bbox_coordinates(self):
         """
@@ -575,11 +587,13 @@ class ChessFenAnnotatorController(Controller):
         draw bbox on current image.
         """
         self.load_bbox_coordinates()
+
         self.previous_frame = self.current_frame
         self.current_frame -= 1
         self.get_next_frame(set_previous_frame=False)
 
     def get_next_frame(self, event=None, set_previous_frame=True):
+
         """Get next frame from generator and save it to self.frames
         then replace the current frame with the new frame.
         If self.current_frame is in (-1; len(self.frames)-1) then
@@ -588,10 +602,12 @@ class ChessFenAnnotatorController(Controller):
         try:
             if set_previous_frame:
                 self.previous_frame = self.current_frame
+
             self.current_frame += 1
 
             if self.current_frame > -1 and \
                     self.current_frame < len(self.frames):
+
                 # print(len(self.frames))
                 frame_number = self.frames[self.current_frame]
                 last_frame_number = self.frames[self.previous_frame]
@@ -612,6 +628,7 @@ class ChessFenAnnotatorController(Controller):
                 next_frame = Image.fromarray(next_img)
                 self.frames.append(frame_number)
 
+
             self.load_bbox_coordinates()
             self.view.frames["video"].set_image(
                 next_frame,
@@ -621,7 +638,9 @@ class ChessFenAnnotatorController(Controller):
 
         except StopIteration:
             print(traceback.print_exc())
+
             # self.current_frame -= 1
+
             self.update_states(caller="next_frame_empty")
             return
 
@@ -632,6 +651,7 @@ class ChessFenAnnotatorController(Controller):
         and display next frame.
         """
         if self.current_frame > self.last_saved_frame[-1] + 1:
+
             self.previous_frame = self.current_frame
             self.current_frame -= 2
             self.get_next_frame(set_previous_frame=False)
