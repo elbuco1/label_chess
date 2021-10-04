@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import cv2
-from functools import lru_cache
 
 
 def frames_from_video_generator(video_path, fps_ratio):
@@ -33,15 +32,17 @@ def frames_from_video_generator(video_path, fps_ratio):
             break
     cap.release()
 
+
 def frame_id_generator(video, fps_ratio=1):
     """ Generator of frame positions with a
     fixed offset.
     """
     nb_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     for i in range(0, nb_frames, fps_ratio):
-        yield i 
+        yield i
 
-def get_video_frame(video, frame_id, last_frame_id = 0):
+
+def get_video_frame(video, frame_id, last_frame_id=0):
     """ Get a specific frame from a video
     Args:
         video (cv2.VideoCapture)
@@ -53,7 +54,7 @@ def get_video_frame(video, frame_id, last_frame_id = 0):
     if frame_id - last_frame_id != 1:
         video.set(cv2.CAP_PROP_POS_FRAMES, frame_id)
 
-    ret, frame = video.read() 
+    ret, frame = video.read()
 
     if ret:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

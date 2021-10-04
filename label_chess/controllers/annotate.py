@@ -579,7 +579,7 @@ class ChessFenAnnotatorController(Controller):
         self.current_frame -= 1
         self.get_next_frame(set_previous_frame=False)
 
-    def get_next_frame(self, event=None, set_previous_frame = True):
+    def get_next_frame(self, event=None, set_previous_frame=True):
         """Get next frame from generator and save it to self.frames
         then replace the current frame with the new frame.
         If self.current_frame is in (-1; len(self.frames)-1) then
@@ -597,21 +597,20 @@ class ChessFenAnnotatorController(Controller):
                 last_frame_number = self.frames[self.previous_frame]
 
                 next_img = utils.get_video_frame(
-                    self.video_file, frame_number,last_frame_number)
+                    self.video_file, frame_number, last_frame_number)
                 next_frame = Image.fromarray(next_img)
 
             else:
                 frame_number = next(self.frame_generator)
 
                 last_frame_number = -1
-                if self.previous_frame > 0 :
+                if self.previous_frame > 0:
                     last_frame_number = self.frames[self.previous_frame]
 
                 next_img = utils.get_video_frame(
                     self.video_file, frame_number, last_frame_number)
                 next_frame = Image.fromarray(next_img)
                 self.frames.append(frame_number)
-
 
             self.load_bbox_coordinates()
             self.view.frames["video"].set_image(

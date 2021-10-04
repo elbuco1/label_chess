@@ -30,14 +30,14 @@ class ExportDialog(simpledialog.Dialog):
 
         self.container = tk.LabelFrame(
             master=frame, text="Annotations", **cfg.LBL_FRM())
-        self.container.pack(fill = tk.BOTH)
-  
+        self.container.pack(fill=tk.BOTH)
+
         # one checkbox per option
         for option in self.options:
             self.vars[option] = tk.IntVar()
             self.check_boxes[option] = tk.Checkbutton(self.container, text=option,
                                                       variable=self.vars[option])
-            self.check_boxes[option].pack(fill = tk.BOTH)
+            self.check_boxes[option].pack(fill=tk.BOTH)
 
         return frame
 
