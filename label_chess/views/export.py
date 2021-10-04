@@ -28,24 +28,16 @@ class ExportDialog(simpledialog.Dialog):
 
     def body(self, frame):
 
-        frame.columnconfigure(0, weight=1)
-        frame.rowconfigure(0, weight=1)
-
         self.container = tk.LabelFrame(
             master=frame, text="Annotations", **cfg.LBL_FRM())
-        self.container.grid(row=0, column=0, sticky="nsew")
-
-        self.container.columnconfigure(0, weight=1)
-        self.container.rowconfigure(
-            [i for i, _ in enumerate(self.options)],
-            weight=1)
+        self.container.pack(fill=tk.BOTH)
 
         # one checkbox per option
-        for i, option in enumerate(self.options):
+        for option in self.options:
             self.vars[option] = tk.IntVar()
             self.check_boxes[option] = tk.Checkbutton(self.container, text=option,
                                                       variable=self.vars[option])
-            self.check_boxes[option].grid(row=i, column=0, sticky="nsew")
+            self.check_boxes[option].pack(fill=tk.BOTH)
 
         return frame
 
