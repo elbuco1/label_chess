@@ -561,7 +561,6 @@ class ChessFenAnnotatorController(Controller):
         """
         self.current_fen += 1
 
-
         if self.current_fen < len(self.fens):
             next_fen = self.fens[self.current_fen][-1]
             self.view.frames["pgn"].set_image(next_fen)
@@ -569,7 +568,6 @@ class ChessFenAnnotatorController(Controller):
             messagebox.showwarning("Positions",
                                    "No position (fen) available",
                                    parent=self.view)
-
 
     def load_bbox_coordinates(self):
         """
@@ -593,7 +591,6 @@ class ChessFenAnnotatorController(Controller):
         self.get_next_frame(set_previous_frame=False)
 
     def get_next_frame(self, event=None, set_previous_frame=True):
-
         """Get next frame from generator and save it to self.frames
         then replace the current frame with the new frame.
         If self.current_frame is in (-1; len(self.frames)-1) then
@@ -627,7 +624,6 @@ class ChessFenAnnotatorController(Controller):
                     self.video_file, frame_number, last_frame_number)
                 next_frame = Image.fromarray(next_img)
                 self.frames.append(frame_number)
-
 
             self.load_bbox_coordinates()
             self.view.frames["video"].set_image(
