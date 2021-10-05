@@ -35,11 +35,12 @@ jobs:
           flake8 ./label_chess/* --max-line-length=90 --exclude=tests/*,label_chess/VERSION,label_chess/__init__.py,label_chess/controllers/__init__.py,label_chess/views/__init__.py
       - name: Test with pytest
         run: |
-          pytest -vvv tests/* --cov=fen2pil
+          pytest -vvv tests/* --cov=label_chess
 
       - name: Test version increase
         run: |
-          FORMER_VERSION=$(git show origin/main:fen2pil/VERSION) || FORMER_VERSION=0.0.0
+          git fetch
+          FORMER_VERSION=$(git show origin/main:label_chess/VERSION) || FORMER_VERSION=0.0.0
           CURRENT_VERSION=$(python setup.py --version)
           python check_version_increase.py  version_increased --former_version $FORMER_VERSION --current_version $CURRENT_VERSION
 
