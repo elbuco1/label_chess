@@ -5,6 +5,4 @@
 
 # TODO release
 
-
-# TODO -> individual export per annotation
 # TODO -> pypi package of models interaction
