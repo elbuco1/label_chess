@@ -5,6 +5,7 @@ from PIL import Image
 import os
 import shutil
 import pandas as pd
+import json
 
 import tkinter as tk
 from tkinter import filedialog, simpledialog
@@ -511,7 +512,6 @@ class ChessFenAnnotatorController(Controller):
 
         try:
             # for each selected annotation file
-            rows = []
             for ann in checked_anns:
                 # path to annotation file in database
                 csv_path = os.path.join(
@@ -525,19 +525,23 @@ class ChessFenAnnotatorController(Controller):
                 # and pgn url
                 annotation = db.query(models.Annotation).filter(
                     models.Annotation.csv_path == csv_path).one()
-                row = [ann, annotation.video_url,
-                       annotation.pgn_url]
-                rows.append(row)
+
+                # save metadata
+                meta = {
+                    "csv_file": ann,
+                    "video_url": annotation.video_url,
+                    "pgn_url": annotation.pgn_url
+                }
+
+                json_name = ann.replace(".csv", ".json", 1)
+                export_json_path = os.path.join(
+                    export_dir,
+                    json_name)
+                with open(export_json_path, "w") as meta_file:
+                    json.dump(meta, meta_file)
+
                 # copy annotation file to export directory
                 shutil.copy(csv_path, export_csv_path)
-
-            # save csv file mapping every annotation file
-            # to its video/pgn urls
-            df = pd.DataFrame(rows, columns=[
-                "annotation_file", "video_url", "pgn_url"])
-            df_path = os.path.join(
-                export_dir, "annotations.csv")
-            df.to_csv(df_path, index=True)
 
         except Exception:
             traceback.print_exc()
