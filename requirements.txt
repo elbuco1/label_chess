@@ -4,3 +4,5 @@ chess>=1.4,<1.5
 sqlalchemy>1.4,<1.5
 Pillow>=8.1.2,<8.2
 fen2pil>=0.0.1
+youtube-dl
+requests

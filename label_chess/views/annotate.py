@@ -243,7 +243,7 @@ class PGNFrame(tk.Frame, ButtonsMixin):
 
         for option in options:
             menu.add_command(label=option,
-                             command=lambda value=option[:self.max_chars_pgn_list]:
+                             command=lambda value=option:
                              self.string_vars["select_pgn"].set(value))
 
     def get_selected_pgn(self):
